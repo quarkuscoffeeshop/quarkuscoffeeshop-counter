@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>quarkus-coffeeshop-parent</artifactId>
+    <groupId>io.quarkuscoffeeshop</groupId>
+    <version>3.0.0</version>
+    <relativePath>../quarkus-coffeeshop-parent</relativePath>
+  </parent>
+  <groupId>io.quarkuscoffeeshop</groupId>
+  <artifactId>quarkus-coffeeshop-core</artifactId>
+  <version>3.0.0</version>
+  <properties />
+
+  <dependencyManagement />
+  <dependencies>
+    <!-- Application Domain -->
+    <dependency>
+      <groupId>io.quarkuscoffeeshop</groupId>
+      <artifactId>quarkus-coffeeshop-domain</artifactId>
+    </dependency>
+    <!-- Testing -->
+    <dependency>
+      <groupId>io.quarkuscoffeeshop</groupId>
+      <artifactId>quarkus-coffeeshop-testutils</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Quarkus stuff -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jsonb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-hibernate-orm-panache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-mongodb-panache</artifactId>
+    </dependency>
+  </dependencies>
+  <build />
+  <profiles />
+</project>
