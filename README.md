@@ -1,10 +1,18 @@
-# quarkus-cafe-core project
+# Quarkus Coffeeshop Core Microservice
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This project uses Quarkus, the Supersonic Subatomic Java Framework.  If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+## Requirements
 
-## Environment variables
+*Docker*
+You need Docker Desktop to run the tests because the application uses Testcontainers, which use Docker, for testing
+
+*Docker Compose*
+It is easy to develop locally using Docker Compose to spin up the services the application depends on.  You can of course install MongoDB and Kafka locally, but the instructions will refer to Docker
+
+## Working Locally
+
+### Environment variables
 
 Quarkus' configuration can be environment specific: https://quarkus.io/guides/config
 
@@ -15,42 +23,25 @@ This service uses the following environment variables when running with the prod
 * MONGO_PASSWORD
 * KAFKA_BOOTSTRAP_URLS
 
-The following line will set al
+You can set them all at once with the following line:
 ```shell
-export MONGO_DB=cafedb MONGO_URL=mongodb://cafe-user:redhat-20@localhost:27017/cafedb MONGO_USERNAME=cafe-user MONGO_PASSWORD=redhat-20 KAFKA_BOOTSTRAP_URLS=localhost:9092 
-
-docker run -i --network="host" -e MONGO_DB=${MONGO_DB} -e MONGO_URL=${MONGO_URL} -e MONGO_USERNAME=${MONGO_USERNAME} -e MONGO_PASSWORD=${MONGO_PASSWORD} -e KAFKA_BOOTSTRAP_URLS=${KAFKA_BOOTSTRAP_URLS} quarkus-cafe-demo/quarkus-cafe-core:latest
-
+export MONGO_DB=cafedb MONGO_URL=mongodb://cafe-user:redhat-20@localhost:27017/cafedb MONGO_USERNAME=cafe-user MONGO_PASSWORD=redhat-20 KAFKA_BOOTSTRAP_URLS=localhost:9092
 ```
 
-## Local deveplomnent steps 
-* uncomment lines 
-```
-#quarkus.container-image.build=true
-#quarkus.container-image.push=true
-#quarkus.native.container-build=true
-#quarkus.jib.base-native-image=quay.io/quarkus/ubi-quarkus-native-image:20.0.0-java11
-#quarkus.container-image.group=jeremydavis
-#quarkus.container-image.name=quarkus-cafe-core
-#quarkus.container-image.tag=0.3
+And start Quarkus in dev mode with:
 
-# Change 
-# HTTP Port
-%dev.quarkus.http.port=8081
+```java
+./mvnw clean compile quarkus:dev -Ddebug=5006
 ```
 
+### Kafka Consumers and Producers
 
-## Running the application in dev mode
+If you have Kafka's command line tools installed you can watch the topics with:
 
-You can run your application in dev mode that enables live coding using:
-```
-./mvnw quarkus:dev
-```
-## Docker Compose
-
-## Kafka Command Line
+```shell script
 kafka-console-consumer --bootstrap-server localhost:9092 --topic orders --from-beginning
 kafka-console-producer --broker-list localhost:9092 --topic orders
+```
 
 ## OpenShift Deployment 
 **Deploy quarkus-cafe-core on OpenShift**
@@ -71,18 +62,10 @@ logback.xml is included for the Testcontainers logging
 
 ## Packaging and running the application
 
-The application is packageable using `./mvnw package`.
-It produces the executable `quarkus-cafe-core-1.0-SNAPSHOT-runner.jar` file in `/target` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
-
-The application is now runnable using `java -jar target/quarkus-cafe-core-1.0-SNAPSHOT-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using: `./mvnw package -Pnative`.
-
-Or you can use Docker to build the native executable using: `./mvnw package -Pnative -Dquarkus.native.container-build=true`.
-
-You can then execute your binary: `./target/quarkus-cafe-core-1.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/building-native-image-guide .
+```shell
+./mvnw clean package -Pnative -Dquarkus.native.container-build=true
+docker build -f src/main/docker/Dockerfile.native -t <<DOCKER_HUB_ID>>/quarkus-cafe-core .
+docker run -i --network="host" -e MONGO_DB=${MONGO_DB} -e MONGO_URL=${MONGO_URL} -e MONGO_USERNAME=${MONGO_USERNAME} -e MONGO_PASSWORD=${MONGO_PASSWORD} -e KAFKA_BOOTSTRAP_URLS=${KAFKA_BOOTSTRAP_URLS} jeremydavis/quarkus-cafe-core:2.4.0
+docker images -a | grep core
+docker tag <<RESULT>> <<DOCKER_HUB_ID>>/quarkus-cafe-core:<<VERSION>>
+```
