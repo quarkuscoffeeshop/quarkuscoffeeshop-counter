@@ -12,6 +12,8 @@ It is easy to develop locally using Docker Compose to spin up the services the a
 
 ## Working Locally
 
+All services in the application can be run locally
+
 ### Environment variables
 
 Quarkus' configuration can be environment specific: https://quarkus.io/guides/config
