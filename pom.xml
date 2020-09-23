@@ -6,10 +6,10 @@
     <artifactId>quarkus-coffeeshop-parent</artifactId>
     <groupId>io.quarkuscoffeeshop</groupId>
     <version>3.0.0</version>
-    <relativePath>../quarkus-coffeeshop-parent</relativePath>
+    <relativePath>../quarkuscoffeeshop-parent</relativePath>
   </parent>
   <groupId>io.quarkuscoffeeshop</groupId>
-  <artifactId>quarkus-coffeeshop-core</artifactId>
+  <artifactId>quarkuscoffeeshop-counter</artifactId>
   <version>3.0.0</version>
   <properties />
 
