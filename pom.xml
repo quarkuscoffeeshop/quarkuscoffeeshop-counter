@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>quarkus-coffeeshop-parent</artifactId>
+    <artifactId>quarkuscoffeeshop-parent</artifactId>
     <groupId>io.quarkuscoffeeshop</groupId>
     <version>3.0.0-SNAPSHOT</version>
     <relativePath>../quarkuscoffeeshop-parent</relativePath>
@@ -18,12 +18,12 @@
     <!-- Application Domain -->
     <dependency>
       <groupId>io.quarkuscoffeeshop</groupId>
-      <artifactId>quarkus-coffeeshop-domain</artifactId>
+      <artifactId>quarkuscoffeeshop-domain</artifactId>
     </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>io.quarkuscoffeeshop</groupId>
-      <artifactId>quarkus-coffeeshop-testutils</artifactId>
+      <artifactId>quarkuscoffeeshop-testutils</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Quarkus stuff -->
