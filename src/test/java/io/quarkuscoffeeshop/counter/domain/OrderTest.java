@@ -18,9 +18,9 @@ public class OrderTest {
         List<LineItem> beverages = new ArrayList<>();
         beverages.add(new LineItem(Item.COFFEE_WITH_ROOM, "Kirk"));
         beverages.add(new LineItem(Item.ESPRESSO_DOUBLE, "Spock"));
-        OrderInCommand orderInCommand = new OrderInCommand(UUID.randomUUID().toString(), beverages, null);
+        OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(), OrderSource.COUNTER, beverages, null);
         System.out.println(orderInCommand);
-        OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(orderInCommand);
+        OrderCreatedEvent orderCreatedEvent = Order.processOrderPlacedEvent(orderInCommand);
         Assert.assertNotNull(orderCreatedEvent);
         Assert.assertNotNull(orderCreatedEvent.events);
         Assert.assertEquals(2, orderCreatedEvent.events.size());
@@ -37,8 +37,8 @@ public class OrderTest {
         List<LineItem> foods = new ArrayList<>();
         foods.add(new LineItem(Item.MUFFIN, "Kirk"));
         foods.add(new LineItem(Item.CAKEPOP, "Spock"));
-        OrderInCommand orderInCommand = new OrderInCommand(UUID.randomUUID().toString(),null, foods);
-        OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(orderInCommand);
+        OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent(UUID.randomUUID().toString(), OrderSource.COUNTER, null, foods);
+        OrderCreatedEvent orderCreatedEvent = Order.processOrderPlacedEvent(orderPlacedEvent);
 
         Assert.assertNotNull(orderCreatedEvent);
         Assert.assertNotNull(orderCreatedEvent.events);
@@ -61,8 +61,8 @@ public class OrderTest {
         beverages.add(new LineItem(Item.CAPPUCCINO, "Kirk"));
         beverages.add(new LineItem(Item.COFFEE_BLACK, "Spock"));
 
-        OrderInCommand orderInCommand = new OrderInCommand(UUID.randomUUID().toString(), beverages, foods);
-        OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(orderInCommand);
+        OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(), OrderSource.COUNTER, beverages, foods);
+        OrderCreatedEvent orderCreatedEvent = Order.processOrderPlacedEvent(orderInCommand);
 
         Assert.assertNotNull(orderCreatedEvent);
         Assert.assertNotNull(orderCreatedEvent.events);

@@ -48,7 +48,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends KafkaIT {
         menuItems.add(new LineItem(Item.CAKEPOP, "Harry"));
         menuItems.add(new LineItem(Item.MUFFIN, "Hermione"));
 
-        final OrderInCommand orderInCommand = new OrderInCommand(UUID.randomUUID().toString(),beverages, menuItems);
+        final OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(),OrderSource.DELIVERY, beverages, menuItems);
 
         // send the order to Kafka
         producerMap.get("web-in").send(new ProducerRecord("web-in", JsonUtil.toJson(orderInCommand)));
@@ -96,7 +96,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends KafkaIT {
         final List<LineItem> beverages = new ArrayList<>();
         beverages.add(new LineItem(Item.COFFEE_WITH_ROOM, "Kirk"));
         beverages.add(new LineItem(Item.ESPRESSO_DOUBLE, "Spock"));
-        final OrderInCommand orderInCommand = new OrderInCommand(UUID.randomUUID().toString(),beverages, null);
+        final OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(),OrderSource.DELIVERY, beverages, null);
 
         // send the order to Kafka and wait
         producerMap.get("web-in").send(new ProducerRecord("web-in", JsonUtil.jsonb.toJson(orderInCommand)));
@@ -126,7 +126,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends KafkaIT {
         final List<LineItem> menuItems = new ArrayList<>();
         menuItems.add(new LineItem(Item.CAKEPOP, "Mickey"));
         menuItems.add(new LineItem(Item.MUFFIN, "Goofy"));
-        final OrderInCommand orderInCommand = new OrderInCommand(UUID.randomUUID().toString(),null, menuItems);
+        final OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(),OrderSource.DELIVERY,null, menuItems);
 
         // send the order to Kafka
         producerMap.get("web-in").send(new ProducerRecord("web-in", JsonUtil.jsonb.toJson(orderInCommand)));

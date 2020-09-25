@@ -37,7 +37,7 @@ public class KafkaService {
     @Incoming("web-in")
     public CompletionStage<Void> onOrderIn(final Message message) {
         logger.debug("orderIn: {}", message.getPayload());
-        return handleCreateOrderCommand(JsonUtil.createOrderCommandFromJson(message.getPayload().toString())).thenRun(()->{message.ack();});
+        return onOrderPlacedEvent(JsonUtil.createOrderPlacedEventFromJson(message.getPayload().toString())).thenRun(()->{message.ack();});
     }
 
     CompletableFuture<Void> sendBaristaOrder(final LineItemEvent event) {
@@ -56,10 +56,10 @@ public class KafkaService {
         return webUpdatesOutEmitter.send(JsonUtil.toInProgressUpdate(event)).toCompletableFuture();
     }
 
-    protected CompletionStage<Void> handleCreateOrderCommand(final OrderInCommand orderInCommand) {
+    protected CompletionStage<Void> onOrderPlacedEvent(final OrderPlacedEvent orderPlacedEvent) {
 
         // Get the event from the Order domain object
-        OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(orderInCommand);
+        OrderCreatedEvent orderCreatedEvent = Order.processOrderPlacedEvent(orderPlacedEvent);
         orderRepository.persist(orderCreatedEvent.order);
 
         Collection<CompletableFuture<Void>> futures = new ArrayList<>(orderCreatedEvent.getEvents().size() * 2);
