@@ -5,6 +5,8 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 @RegisterForReflection
 public class OrderCreatedEvent {
@@ -30,5 +32,29 @@ public class OrderCreatedEvent {
 
     public void addEvents(List<LineItemEvent> orderEvents) {
         getEvents().addAll(orderEvents);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", OrderCreatedEvent.class.getSimpleName() + "[", "]")
+                .add("order=" + order)
+                .add("events=" + events)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrderCreatedEvent that = (OrderCreatedEvent) o;
+        return Objects.equals(order, that.order) &&
+                Objects.equals(events, that.events);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(order, events);
     }
 }

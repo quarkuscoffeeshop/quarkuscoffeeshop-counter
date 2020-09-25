@@ -41,18 +41,21 @@ public class KafkaService {
     }
 
     CompletableFuture<Void> sendBaristaOrder(final LineItemEvent event) {
+        logger.debug("sendBaristaOrder: {}", JsonUtil.toJson(event));
         return baristaOutEmitter.send(JsonUtil.toJson(event)).thenRun(() ->{
             sendWebUpdate(event);
         }).toCompletableFuture().toCompletableFuture();
     }
 
     CompletableFuture<Void> sendKitchenOrder(final LineItemEvent event) {
+        logger.debug("sendKitchenOrder: {}", JsonUtil.toJson(event));
         return kitchenOutEmitter.send(JsonUtil.toJson(event)).thenRun(() ->{
             sendWebUpdate(event);
         }).toCompletableFuture();
     }
 
     CompletableFuture<Void> sendWebUpdate(final LineItemEvent event) {
+        logger.debug("sendWebUpdate: {}", JsonUtil.toInProgressUpdate(event));
         return webUpdatesOutEmitter.send(JsonUtil.toInProgressUpdate(event)).toCompletableFuture();
     }
 

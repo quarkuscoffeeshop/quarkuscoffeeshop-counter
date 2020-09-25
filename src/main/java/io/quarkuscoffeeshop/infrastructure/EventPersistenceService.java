@@ -27,8 +27,9 @@ public class EventPersistenceService {
 
     @Incoming("order-events") @Transactional
     public CompletionStage<Void> recordOrderEvent(final Message message) {
-        logger.debug("received {}", message.getPayload());
+        logger.debug("recordOrderEvent {}", message.getPayload());
         String payload = (String) message.getPayload();
+        logger.debug("raw payload {}", payload);
         JsonReader jsonReader = Json.createReader(new StringReader(payload));
         JsonObject jsonObject = jsonReader.readObject();
         logger.debug("unmarshalled {}", jsonObject);
