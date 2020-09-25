@@ -1,8 +1,6 @@
-package io.quarkuscoffeeshop.core.domain;
+package io.quarkuscoffeeshop.counter.domain;
 
 import io.quarkuscoffeeshop.domain.*;
-import io.quarkuscoffeeshop.core.domain.Order;
-import io.quarkuscoffeeshop.core.domain.OrderCreatedEvent;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class OrderTest {

@@ -1,11 +1,10 @@
-package io.quarkuscoffeeshop.core.infrastructure;
+package io.quarkuscoffeeshop.counter.infrastructure;
 
 import io.quarkuscoffeeshop.infrastructure.*;
-import io.quarkuscoffeeshop.domain.*;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
-import io.quarkuscoffeeshop.core.domain.Order;
+import io.quarkuscoffeeshop.counter.domain.Order;
 import io.quarkuscoffeeshop.infrastructure.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;

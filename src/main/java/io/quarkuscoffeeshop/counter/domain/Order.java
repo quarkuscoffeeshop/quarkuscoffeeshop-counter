@@ -1,4 +1,4 @@
-package io.quarkuscoffeeshop.core.domain;
+package io.quarkuscoffeeshop.counter.domain;
 
 import io.quarkuscoffeeshop.domain.*;
 import io.quarkus.runtime.annotations.RegisterForReflection;

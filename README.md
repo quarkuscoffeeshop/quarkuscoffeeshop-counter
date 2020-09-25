@@ -71,3 +71,8 @@ docker run -i --network="host" -e MONGO_DB=${MONGO_DB} -e MONGO_URL=${MONGO_URL}
 docker images -a | grep counter
 docker tag <<RESULT>> <<DOCKER_HUB_ID>>/quarkuscoffeeshop-counter:<<VERSION>>
 ```
+## CHANGELOG
+
+3.1.0
+* refactored package "io.quarkuscoffeeshop.core" to "io.quarkuscoffeeshop.counter"
+* Added persistence for events in orders topic

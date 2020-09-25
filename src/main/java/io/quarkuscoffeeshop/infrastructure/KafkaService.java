@@ -1,7 +1,7 @@
 package io.quarkuscoffeeshop.infrastructure;
 
 import io.quarkuscoffeeshop.domain.*;
-import io.quarkuscoffeeshop.core.domain.*;
+import io.quarkuscoffeeshop.counter.domain.*;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.eclipse.microprofile.reactive.messaging.*;
 import org.slf4j.Logger;
