@@ -51,7 +51,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends KafkaIT {
         final OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(),OrderSource.DELIVERY, beverages, menuItems);
 
         // send the order to Kafka
-        producerMap.get("web-in").send(new ProducerRecord("web-in", JsonUtil.toJson(orderInCommand)));
+        producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.toJson(orderInCommand)));
         Thread.sleep(1000);
 
 
@@ -99,7 +99,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends KafkaIT {
         final OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(),OrderSource.DELIVERY, beverages, null);
 
         // send the order to Kafka and wait
-        producerMap.get("web-in").send(new ProducerRecord("web-in", JsonUtil.jsonb.toJson(orderInCommand)));
+        producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(orderInCommand)));
         Thread.sleep(1000);
 
         // intercept the messages from the appropriate consumer
@@ -129,7 +129,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends KafkaIT {
         final OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(),OrderSource.DELIVERY,null, menuItems);
 
         // send the order to Kafka
-        producerMap.get("web-in").send(new ProducerRecord("web-in", JsonUtil.jsonb.toJson(orderInCommand)));
+        producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(orderInCommand)));
 
         Thread.sleep(2000);
 
