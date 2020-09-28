@@ -25,8 +25,8 @@ public class JsonUtil {
         return jsonb.toJson(new OrderReadyUpdate(orderUpEvent));
     }
 
-    public static OrderPlacedEvent createOrderPlacedEventFromJson(String payload) {
-        return jsonb.fromJson(payload, OrderPlacedEvent.class);
+    public static PlaceOrderCommand createPlaceOrderCommandFromJson(String payload) {
+        return jsonb.fromJson(payload, PlaceOrderCommand.class);
     }
 
     public static String toInProgressUpdate(final LineItemEvent lineItemEvent) {

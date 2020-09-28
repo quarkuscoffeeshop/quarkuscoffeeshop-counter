@@ -33,8 +33,8 @@ public class Order {
         this.beverageLineItems = beverageLineItems;
     }
 
-    public static OrderCreatedEvent processOrderPlacedEvent(OrderPlacedEvent orderPlacedEvent) {
-        Order order = createOrderFromOrderPlacedEvent(orderPlacedEvent);
+    public static OrderCreatedEvent handlePlaceOrderCommand(PlaceOrderCommand placeOrderCommand) {
+        Order order = createOrderFromCommand(placeOrderCommand);
         return createOrderCreatedEvent(order);
     }
 
@@ -59,24 +59,24 @@ public class Order {
         return orderCreatedEvent;
     }
 
-    private static Order createOrderFromOrderPlacedEvent(final OrderPlacedEvent orderPlacedEvent) {
-        logger.debug("createOrderFromCommand: CreateOrderCommand {}", orderPlacedEvent.toString());
+    private static Order createOrderFromCommand(final PlaceOrderCommand placeOrderCommand) {
+        logger.debug("createOrderFromCommand: CreateOrderCommand {}", placeOrderCommand.toString());
 
         // build the order from the CreateOrderCommand
         Order order = new Order();
-        order.id = orderPlacedEvent.id;
-        if (orderPlacedEvent.getBeverages().size() >= 1) {
-            logger.debug("createOrderFromCommand adding beverages {}", orderPlacedEvent.beverages.size());
-            orderPlacedEvent.beverages.forEach(b -> {
-                logger.debug("createOrderFromCommand adding beverage {}", b.toString());
-                order.getBeverageLineItems().add(new LineItem(b.item, b.name));
+        order.id = placeOrderCommand.getId();
+        if (placeOrderCommand.getBaristaItems().isPresent()) {
+            logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaItems().get().size());
+            placeOrderCommand.getBaristaItems().get().forEach((k,v) -> {
+                logger.debug("createOrderFromCommand adding baristaItem {}", v.toString());
+                order.getBeverageLineItems().add(new LineItem(v.getItem(), k));
             });
         }
-        if (orderPlacedEvent.getKitchenOrders().size() >= 1) {
-            logger.debug("createOrderFromCommand adding kitchenOrders {}", orderPlacedEvent.kitchenOrders.size());
-            orderPlacedEvent.kitchenOrders.forEach(k -> {
-                logger.debug("createOrderFromCommand adding kitchenOrder {}", k.toString());
-                order.getKitchenLineItems().add(new LineItem(k.item, k.name));
+        if (placeOrderCommand.getKitchenItems().isPresent()) {
+            logger.debug("createOrderFromCommand adding kitchenOrders {}", placeOrderCommand.getKitchenItems().get().size());
+            placeOrderCommand.getKitchenItems().get().forEach((k,v) ->{
+                logger.debug("createOrderFromCommand adding kitchenItem {}", k.toString());
+                order.getKitchenLineItems().add(new LineItem(v.getItem(), k));
             });
         }
         return order;

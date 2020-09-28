@@ -1,6 +1,8 @@
 package io.quarkuscoffeeshop.infrastructure;
 
+import io.quarkuscoffeeshop.counter.domain.CoffeeshopCommand;
 import io.quarkuscoffeeshop.counter.domain.CoffeeshopEvent;
+import io.quarkuscoffeeshop.domain.CommandType;
 import io.quarkuscoffeeshop.domain.EventType;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
@@ -25,6 +27,9 @@ public class EventPersistenceService {
     @Inject
     CoffeeshopEventRepository coffeeshopEventRepository;
 
+    @Inject
+    CoffeeShopCommandRepository coffeeShopCommandRepository;
+
     @Incoming("order-events") @Transactional
     public CompletionStage<Void> recordOrderEvent(final Message message) {
         logger.debug("recordOrderEvent {}", message.getPayload());
@@ -33,10 +38,17 @@ public class EventPersistenceService {
         JsonReader jsonReader = Json.createReader(new StringReader(payload));
         JsonObject jsonObject = jsonReader.readObject();
         logger.debug("unmarshalled {}", jsonObject);
-        EventType eventType = EventType.valueOf(jsonObject.getString("eventType"));
-        CoffeeshopEvent coffeeshopEvent = new CoffeeshopEvent(eventType, payload);
-        logger.debug("CoffeeshopEvent {}", coffeeshopEvent);
-        coffeeshopEventRepository.persist(coffeeshopEvent);
+        if (jsonObject.containsKey("eventType")){
+            CoffeeshopEvent coffeeshopEvent = new CoffeeshopEvent(
+                    EventType.valueOf(jsonObject.getString("eventType")), payload);
+            logger.debug("CoffeeshopEvent {}", coffeeshopEvent);
+            coffeeshopEventRepository.persist(coffeeshopEvent);
+        }else if(jsonObject.containsKey("commandType")){
+            CoffeeshopCommand coffeeshopCommand = new CoffeeshopCommand(
+                    CommandType.valueOf(jsonObject.getString("commandType")), payload);
+            logger.debug("CoffeeshopCommand {}", coffeeshopCommand);
+            coffeeShopCommandRepository.persist(coffeeshopCommand);
+        }
         return message.ack();
     }
 }
