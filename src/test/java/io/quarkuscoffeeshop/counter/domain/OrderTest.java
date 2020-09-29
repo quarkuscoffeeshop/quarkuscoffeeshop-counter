@@ -5,10 +5,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,7 +27,7 @@ public class OrderTest {
         Assert.assertEquals(2, orderCreatedEvent.events.size());
         orderCreatedEvent.events.forEach(e -> {
             Assert.assertEquals(OrderInEvent.class, e.getClass());
-            Assert.assertTrue(e.name.equals("Dopey") || e.name.equals("Spock"));
+            Assert.assertTrue(e.name.equals("Kirk") || e.name.equals("Spock"));
             Assert.assertEquals(EventType.BEVERAGE_ORDER_IN, e.eventType);
         });
     }
@@ -40,11 +37,11 @@ public class OrderTest {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
+                null,
                 new HashMap<String, MenuItem>(){{
                     put("Kirk", new MenuItem(Item.CROISSANT, BigDecimal.valueOf(3.75)));
                     put("Spock", new MenuItem(Item.CAKEPOP, BigDecimal.valueOf(3.75)));
-                }},
-                null);
+                }});
         OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
 
         Assert.assertNotNull(orderCreatedEvent);
