@@ -16,9 +16,9 @@ public class OrderTest {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
-                new HashMap<String, MenuItem>(){{
-                    put("Kirk", new MenuItem(Item.CAPPUCCINO, BigDecimal.valueOf(3.75)));
-                    put("Spock", new MenuItem(Item.COFFEE_WITH_ROOM, BigDecimal.valueOf(3.75)));
+                new ArrayList<OrderLineItem>(){{
+                    add(new OrderLineItem(Item.CAPPUCCINO, Double.valueOf(3.75), "Kirk"));
+                    add(new OrderLineItem(Item.COFFEE_WITH_ROOM, Double.valueOf(3.75),"Spock"));
                 }},
                 null);
         OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
@@ -38,9 +38,9 @@ public class OrderTest {
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
                 null,
-                new HashMap<String, MenuItem>(){{
-                    put("Kirk", new MenuItem(Item.CROISSANT, BigDecimal.valueOf(3.75)));
-                    put("Spock", new MenuItem(Item.CAKEPOP, BigDecimal.valueOf(3.75)));
+                new ArrayList<OrderLineItem>(){{
+                    add(new OrderLineItem(Item.CROISSANT, Double.valueOf(3.75), "Kirk"));
+                    add(new OrderLineItem(Item.CAKEPOP, Double.valueOf(3.75),"Spock"));
                 }});
         OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
 
@@ -59,13 +59,13 @@ public class OrderTest {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
-                new HashMap<String, MenuItem>(){{
-                    put("Kirk", new MenuItem(Item.COFFEE_BLACK, BigDecimal.valueOf(3.75)));
-                    put("Spock", new MenuItem(Item.CAPPUCCINO, BigDecimal.valueOf(3.75)));
+                new ArrayList<OrderLineItem>(){{
+                    add(new OrderLineItem(Item.CAPPUCCINO, Double.valueOf(3.75), "Kirk"));
+                    add(new OrderLineItem(Item.COFFEE_WITH_ROOM, Double.valueOf(3.75),"Spock"));
                 }},
-                new HashMap<String, MenuItem>(){{
-                    put("Kirk", new MenuItem(Item.CROISSANT, BigDecimal.valueOf(3.75)));
-                    put("Spock", new MenuItem(Item.CAKEPOP, BigDecimal.valueOf(3.75)));
+                new ArrayList<OrderLineItem>(){{
+                    add(new OrderLineItem(Item.CROISSANT, Double.valueOf(3.75), "Kirk"));
+                    add(new OrderLineItem(Item.CAKEPOP, Double.valueOf(3.75),"Spock"));
                 }});
         OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
 
