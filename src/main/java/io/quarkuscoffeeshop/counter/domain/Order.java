@@ -67,16 +67,16 @@ public class Order {
         order.id = placeOrderCommand.getId();
         if (placeOrderCommand.getBaristaItems().isPresent()) {
             logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaItems().get().size());
-            placeOrderCommand.getBaristaItems().get().forEach((k,v) -> {
+            placeOrderCommand.getBaristaItems().get().forEach((v) -> {
                 logger.debug("createOrderFromCommand adding baristaItem {}", v.toString());
-                order.getBeverageLineItems().add(new LineItem(v.getItem(), k));
+                order.getBeverageLineItems().add(new LineItem(v.getItem(), v.getName()));
             });
         }
         if (placeOrderCommand.getKitchenItems().isPresent()) {
             logger.debug("createOrderFromCommand adding kitchenOrders {}", placeOrderCommand.getKitchenItems().get().size());
-            placeOrderCommand.getKitchenItems().get().forEach((k,v) ->{
-                logger.debug("createOrderFromCommand adding kitchenItem {}", k.toString());
-                order.getKitchenLineItems().add(new LineItem(v.getItem(), k));
+            placeOrderCommand.getKitchenItems().get().forEach((v) ->{
+                logger.debug("createOrderFromCommand adding kitchenItem {}", v.toString());
+                order.getKitchenLineItems().add(new LineItem(v.getItem(), v.getName()));
             });
         }
         return order;
