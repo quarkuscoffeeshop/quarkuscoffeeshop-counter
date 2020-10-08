@@ -55,8 +55,10 @@ public class KafkaService {
             logger.info("event received from orders topic: {}", eventType);
             switch (eventType) {
                 case "BEVERAGE_ORDER_IN":
+                    logger.info("ignoring {} event", eventType);
                     return message.ack();
                 case "KITCHEN_ORDER_IN":
+                    logger.info("ignoring {} event", eventType);
                     return message.ack();
                 case "BEVERAGE_ORDER_UP":
                     return webUpdatesOutEmitter.send(JsonUtil.toDashboardUpdateReadyJson(payload)).toCompletableFuture().thenRun(()->{message.ack();});
