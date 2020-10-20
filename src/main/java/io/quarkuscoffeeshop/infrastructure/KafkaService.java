@@ -74,13 +74,15 @@ public class KafkaService {
     CompletableFuture<Void> sendBaristaOrder(final LineItemEvent event) {
         logger.debug("sendBaristaOrder: {}", JsonUtil.toJson(event));
         return baristaOutEmitter.send(JsonUtil.toJson(event)).thenRun(() ->{
+            logger.debug("sending web update {}", event);
             sendInProgressWebUpdate(event);
-        }).toCompletableFuture().toCompletableFuture();
+        }).toCompletableFuture();
     }
 
     CompletableFuture<Void> sendKitchenOrder(final LineItemEvent event) {
         logger.debug("sendKitchenOrder: {}", JsonUtil.toJson(event));
         return kitchenOutEmitter.send(JsonUtil.toJson(event)).thenRun(() ->{
+            logger.debug("sending web update {}", event);
             sendInProgressWebUpdate(event);
         }).toCompletableFuture();
     }
@@ -90,14 +92,22 @@ public class KafkaService {
         return webUpdatesOutEmitter.send(JsonUtil.toInProgressUpdate(event)).toCompletableFuture();
     }
 
+    CompletableFuture<Void> persistOrder(final OrderCreatedEvent orderCreatedEvent) {
+
+        return CompletableFuture.runAsync(() -> {
+            orderRepository.persist(orderCreatedEvent.order);
+        }).exceptionally(e -> { logger.error(e.getMessage()); return null; }).toCompletableFuture();
+    }
+
     protected CompletionStage<Void> handlePlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
 
         logger.debug("PlaceOrderCommand received: {}", placeOrderCommand);
         // Get the event from the Order domain object
         OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
-        orderRepository.persist(orderCreatedEvent.order);
+//        orderRepository.persist(orderCreatedEvent.order);
 
-        Collection<CompletableFuture<Void>> futures = new ArrayList<>(orderCreatedEvent.getEvents().size() * 2);
+        Collection<CompletableFuture<Void>> futures = new ArrayList<>((orderCreatedEvent.getEvents().size() * 2) + 1);
+        futures.add(persistOrder(orderCreatedEvent));
         orderCreatedEvent.getEvents().forEach(e ->{
             if (e.eventType.equals(EventType.BEVERAGE_ORDER_IN)) {
                 futures.add(sendBaristaOrder(e));

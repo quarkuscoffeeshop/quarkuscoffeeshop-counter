@@ -14,9 +14,7 @@ import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-import javax.transaction.Transactional;
 import java.io.StringReader;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
@@ -30,7 +28,7 @@ public class EventPersistenceService {
     @Inject
     CoffeeShopCommandRepository coffeeShopCommandRepository;
 
-    @Incoming("order-events") @Transactional
+    @Incoming("order-events")
     public CompletionStage<Void> recordOrderEvent(final Message message) {
         logger.debug("recordOrderEvent {}", message.getPayload());
         String payload = (String) message.getPayload();
