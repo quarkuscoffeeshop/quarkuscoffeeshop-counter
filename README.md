@@ -72,8 +72,11 @@ docker run -i --network="host" -e MONGO_DB=${MONGO_DB} -e MONGO_URL=${MONGO_URL}
 docker images -a | grep counter
 docker tag <<RESULT>> <<DOCKER_HUB_ID>>/quarkuscoffeeshop-counter:<<VERSION>>
 ```
+
+NOTE: Connection string for Replica Set: mongodb://mongodb:mongodb+srv@quarkus-coffeeshop-replica-set-0.quarkus-coffeeshop-replica-set-svc.quarkuscoffeeshop-demo.svc.cluster.local:27017,quarkus-coffeeshop-replica-set-1.quarkus-coffeeshop-replica-set-svc.quarkuscoffeeshop-demo.svc.cluster.local:27017,quarkus-coffeeshop-replica-set-2.quarkus-coffeeshop-replica-set-svc.quarkuscoffeeshop-demo.svc.cluster.local:27017/cafedb?replicaSet=quarkus-coffeeshop-replica-set
+
 ## CHANGELOG
 
-3.1.0
+3.2.2
 * refactored package "io.quarkuscoffeeshop.core" to "io.quarkuscoffeeshop.counter"
 * Added persistence for events in orders topic

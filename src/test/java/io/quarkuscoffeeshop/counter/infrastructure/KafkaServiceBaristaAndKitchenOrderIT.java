@@ -8,6 +8,7 @@ import io.quarkus.test.junit.mockito.InjectMock;
 import io.quarkuscoffeeshop.counter.domain.Order;
 import io.quarkuscoffeeshop.infrastructure.JsonUtil;
 import io.quarkuscoffeeshop.infrastructure.OrderRepository;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -16,139 +17,148 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import java.io.StringReader;
+import java.math.BigDecimal;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
 @QuarkusTestResource(CafeITResource.class)
-public class KafkaServiceBaristaAndKitchenOrderIT extends KafkaIT {
+public class KafkaServiceBaristaAndKitchenOrderIT extends BaseOrderIT {
 
-    @InjectMock
-    OrderRepository orderRepository;
+    final List<OrderLineItem> baristaItems = Arrays.asList(
+            new OrderLineItem(Item.COFFEE_WITH_ROOM, BigDecimal.valueOf(3.5), "Kirk"),
+            new OrderLineItem(Item.ESPRESSO_DOUBLE, BigDecimal.valueOf(5.5), "Spock")
+    );
 
-    @BeforeEach
-    public void setup() {
-        Mockito.doAnswer(new TestUtil.AssignIdToEntityAnswer(UUID.randomUUID().toString())).when(orderRepository).persist(any(Order.class));
-    }
+    final List<OrderLineItem> kitchenItems = Arrays.asList(
+            new OrderLineItem(Item.CAKEPOP, BigDecimal.valueOf(3.50), "Mickey"),
+            new OrderLineItem(Item.MUFFIN, BigDecimal.valueOf(3.50),"Goofy")
+    );
 
     @Test
     public void testOrderInBeveragesAndKitchen() throws InterruptedException {
 
-        final List<LineItem> beverages = new ArrayList<>();
-        beverages.add(new LineItem(Item.COFFEE_WITH_ROOM, "Kirk"));
-        beverages.add(new LineItem(Item.ESPRESSO_DOUBLE, "Spock"));
-
-        final List<LineItem> menuItems = new ArrayList<>();
-        menuItems.add(new LineItem(Item.CAKEPOP, "Harry"));
-        menuItems.add(new LineItem(Item.MUFFIN, "Hermione"));
-
-        final OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(),OrderSource.DELIVERY, beverages, menuItems);
+        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, baristaItems, kitchenItems, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka
-        producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.toJson(orderInCommand)));
+        producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.toJson(placeOrderCommand)));
         Thread.sleep(1000);
 
 
         // Get the appropriate consumer, point to the first message, and pull all messages
-        final KafkaConsumer baristaConsumer = consumerMap.get("barista-in");
-        baristaConsumer.seekToBeginning(new ArrayList<TopicPartition>());
+        final KafkaConsumer ordersConsumer = consumerMap.get("orders");
+        ordersConsumer.seekToBeginning(new ArrayList<TopicPartition>());
 
-        final KafkaConsumer kitchenConsumer = consumerMap.get("kitchen-in");
-        kitchenConsumer.seekToBeginning(new ArrayList<TopicPartition>()); //
+        final ConsumerRecords<String, String> records = ordersConsumer.poll(Duration.ofMillis(1000));
 
-        final ConsumerRecords<String, String> baristaRecords = baristaConsumer.poll(Duration.ofMillis(1000));
-        final ConsumerRecords<String, String> kitchenRecords = kitchenConsumer.poll(Duration.ofMillis(1000));
-
-        // verify that the records are of the correct type
-        baristaRecords.forEach(record -> {
-            System.out.println(record.value());
-            final OrderInEvent orderInEvent = JsonUtil.jsonb.fromJson(record.value(), OrderInEvent.class);
-            assertEquals(EventType.BEVERAGE_ORDER_IN, orderInEvent.eventType);
-            assertTrue(orderInEvent.item.equals(Item.ESPRESSO_DOUBLE) || orderInEvent.item.equals(Item.COFFEE_WITH_ROOM),
-                    "The item should be either a " + Item.ESPRESSO_DOUBLE + " or a " + Item.COFFEE_WITH_ROOM + " not a " + orderInEvent.item);
-        });
+        int baristaOrders = 0;
+        int kitchenOrders = 0;
 
         // verify that the records are of the correct type
-        kitchenRecords.forEach(record -> {
-            System.out.println(record.value());
-            final OrderInEvent orderInEvent = JsonUtil.jsonb.fromJson(record.value(), OrderInEvent.class);
-            assertEquals(EventType.KITCHEN_ORDER_IN, orderInEvent.eventType);
+        Iterator iterator = records.iterator();
+        while (iterator.hasNext()) {
+            ConsumerRecord consumerRecord = (ConsumerRecord) iterator.next();
+            String payload = (String) consumerRecord.value();
+            JsonReader jsonReader = Json.createReader(new StringReader(payload));
+            JsonObject jsonObject = jsonReader.readObject();
 
-            assertTrue(orderInEvent.item.equals(Item.CAKEPOP) || orderInEvent.item.equals(Item.MUFFIN),
-                    "The item should be either a " + Item.MUFFIN + " or a " + Item.CAKEPOP + " not a " + orderInEvent.item);
-        });
+            // filter on the type of event
+            if(jsonObject.containsKey("eventType")) {
+                final OrderInEvent orderInEvent = JsonUtil.jsonb.fromJson(payload, OrderInEvent.class);
+                assertNotNull(orderInEvent.eventType);
+                if(orderInEvent.eventType.equals(EventType.BEVERAGE_ORDER_IN)){
+                    assertTrue(orderInEvent.item.equals(Item.ESPRESSO_DOUBLE) || orderInEvent.item.equals(Item.COFFEE_WITH_ROOM),
+                            "The item should be either a " + Item.ESPRESSO_DOUBLE + " or a " + Item.COFFEE_WITH_ROOM + " not a " + orderInEvent.item);
+                    baristaOrders++;
+                } else if (orderInEvent.eventType.equals(EventType.KITCHEN_ORDER_IN)) {
+                    assertTrue(orderInEvent.item.equals(Item.CAKEPOP) || orderInEvent.item.equals(Item.MUFFIN),
+                            "The item should be either a " + Item.MUFFIN + " or a " + Item.CAKEPOP + " not a " + orderInEvent.item);
+                    kitchenOrders++;
+                }
+            }
+        };
 
-        // verify the number of new records
-        assertEquals(2, baristaRecords.count());
-        // verify the number of new records
-        assertEquals(2, kitchenRecords.count());
+        assertEquals(2, baristaOrders);
+        assertEquals(2, kitchenOrders);
     }
 
     @Test
     public void testOrderInBeveragesOnly() throws InterruptedException {
 
-        final List<LineItem> beverages = new ArrayList<>();
-        beverages.add(new LineItem(Item.COFFEE_WITH_ROOM, "Kirk"));
-        beverages.add(new LineItem(Item.ESPRESSO_DOUBLE, "Spock"));
-        final OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(),OrderSource.DELIVERY, beverages, null);
+        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, baristaItems, null, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka and wait
-        producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(orderInCommand)));
+        producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(placeOrderCommand)));
         Thread.sleep(1000);
 
-        // intercept the messages from the appropriate consumer
-        final KafkaConsumer baristaConsumer = consumerMap.get("barista-in");
-        baristaConsumer.seekToBeginning(new ArrayList<TopicPartition>()); //
-        final ConsumerRecords<String, String> newRecords = baristaConsumer.poll(Duration.ofMillis(2000));
+        final KafkaConsumer ordersConsumer = consumerMap.get("orders");
+        ordersConsumer.seekToBeginning(new ArrayList<TopicPartition>());
+
+        final ConsumerRecords<String, String> records = ordersConsumer.poll(Duration.ofMillis(1000));
+
+        int baristaOrders = 0;
 
         // verify that the records are of the correct type
-        newRecords.forEach(record -> {
-            System.out.println("baristaOrder: " + record.value());
-            final OrderInEvent orderInEvent = JsonUtil.jsonb.fromJson(record.value(), OrderInEvent.class);
-//            assertBeverageInEvent(orderInEvent);
-            assertTrue(orderInEvent.item.equals(Item.ESPRESSO_DOUBLE) || orderInEvent.item.equals(Item.COFFEE_WITH_ROOM),
-                    "The item should be either a " + Item.ESPRESSO_DOUBLE + " or a " + Item.COFFEE_WITH_ROOM + " not a " + orderInEvent.item);
-        });
+        Iterator iterator = records.iterator();
+        while (iterator.hasNext()) {
+            ConsumerRecord consumerRecord = (ConsumerRecord) iterator.next();
+            String payload = (String) consumerRecord.value();
+            JsonReader jsonReader = Json.createReader(new StringReader(payload));
+            JsonObject jsonObject = jsonReader.readObject();
 
-        // verify the number of new records
-        assertEquals(2, newRecords.count());
+            // filter on the type of event
+            if(jsonObject.containsKey("eventType")) {
+                final OrderInEvent orderInEvent = JsonUtil.jsonb.fromJson(payload, OrderInEvent.class);
+                assertEquals(EventType.BEVERAGE_ORDER_IN, orderInEvent.eventType);
+                assertTrue(orderInEvent.item.equals(Item.ESPRESSO_DOUBLE) || orderInEvent.item.equals(Item.COFFEE_WITH_ROOM),
+                        "The item should be either a " + Item.ESPRESSO_DOUBLE + " or a " + Item.COFFEE_WITH_ROOM + " not a " + orderInEvent.item);
+                    baristaOrders++;
+            }
+        };
+
+        assertEquals(2, baristaOrders);
     }
 
     @Test
     public void testOrderInKitchenOnly() throws InterruptedException{
+        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, kitchenItems, BigDecimal.valueOf(7.50));
 
-        final List<LineItem> menuItems = new ArrayList<>();
-        menuItems.add(new LineItem(Item.CAKEPOP, "Mickey"));
-        menuItems.add(new LineItem(Item.MUFFIN, "Goofy"));
-        final OrderPlacedEvent orderInCommand = new OrderPlacedEvent(UUID.randomUUID().toString(),OrderSource.DELIVERY,null, menuItems);
+        // send the order to Kafka and wait
+        producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(placeOrderCommand)));
+        Thread.sleep(1000);
 
-        // send the order to Kafka
-        producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(orderInCommand)));
+        final KafkaConsumer ordersConsumer = consumerMap.get("orders");
+        ordersConsumer.seekToBeginning(new ArrayList<TopicPartition>());
 
-        Thread.sleep(2000);
+        final ConsumerRecords<String, String> records = ordersConsumer.poll(Duration.ofMillis(1000));
 
-        // Get the appropriate consumer, point to the first message, and pull all messages
-        final KafkaConsumer kitchenConsumer = consumerMap.get("kitchen-in");
-        kitchenConsumer.seekToBeginning(new ArrayList<TopicPartition>()); //
-        final ConsumerRecords<String, String> newRecords = kitchenConsumer.poll(Duration.ofMillis(5000));
+        int kitchenOrders = 0;
 
         // verify that the records are of the correct type
-        newRecords.forEach(record -> {
-            System.out.println(record.value());
-            final OrderInEvent orderInEvent = JsonUtil.jsonb.fromJson(record.value(), OrderInEvent.class);
-            assertEquals(EventType.KITCHEN_ORDER_IN, orderInEvent.eventType);
-            assertTrue(orderInEvent.item.equals(Item.CAKEPOP) || orderInEvent.item.equals(Item.MUFFIN),
-                    "The item should be either a " + Item.MUFFIN + " or a " + Item.CAKEPOP + " not a " + orderInEvent.item);
-        });
+        Iterator iterator = records.iterator();
+        while (iterator.hasNext()) {
+            ConsumerRecord consumerRecord = (ConsumerRecord) iterator.next();
+            String payload = (String) consumerRecord.value();
+            JsonReader jsonReader = Json.createReader(new StringReader(payload));
+            JsonObject jsonObject = jsonReader.readObject();
 
-        // verify the number of new records
-        assertEquals(2, newRecords.count());
+            // filter on the type of event
+            if(jsonObject.containsKey("eventType")) {
+                final OrderInEvent orderInEvent = JsonUtil.jsonb.fromJson(payload, OrderInEvent.class);
+                assertEquals(EventType.KITCHEN_ORDER_IN, orderInEvent.eventType);
+                assertTrue(orderInEvent.item.equals(Item.CAKEPOP) || orderInEvent.item.equals(Item.MUFFIN),
+                        "The item should be either a " + Item.MUFFIN + " or a " + Item.CAKEPOP + " not a " + orderInEvent.item);
+                kitchenOrders++;
+            }
+        };
 
+        assertEquals(2, kitchenOrders);
     }
 }

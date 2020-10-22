@@ -1,38 +1,35 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
-import io.quarkuscoffeeshop.infrastructure.*;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
-import io.quarkuscoffeeshop.counter.domain.Order;
-import io.quarkuscoffeeshop.infrastructure.OrderRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mockito;
+import io.quarkuscoffeeshop.domain.*;
+import io.quarkuscoffeeshop.infrastructure.CafeITResource;
+import io.quarkuscoffeeshop.infrastructure.JsonUtil;
+import io.vertx.kafka.client.common.TopicPartition;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 @QuarkusTestResource(CafeITResource.class)
-public class KafkaServiceKitchenOrderOnlyIT extends KafkaIT {
+public class KafkaServiceKitchenOrderOnlyIT extends BaseOrderIT {
 
-    @InjectMock
-    OrderRepository orderRepository;
-
-    @BeforeEach
-    public void setup() {
-        Mockito.doAnswer(new TestUtil.AssignIdToEntityAnswer(UUID.randomUUID().toString())).when(orderRepository).persist(any(Order.class));
-    }
-
-/*
     @Test
     public void testOrderInKitchenOnly() throws InterruptedException{
 
-        final List<LineItem> menuItems = new ArrayList<>();
-        menuItems.add(new LineItem(Item.CAKEPOP, "Mickey"));
-        menuItems.add(new LineItem(Item.MUFFIN, "Goofy"));
-        final CreateOrderCommand createOrderCommand = new CreateOrderCommand(null, menuItems);
+        final List<OrderLineItem> kitchenItems = new ArrayList<>();
+        kitchenItems.add(new OrderLineItem(Item.CAKEPOP, BigDecimal.valueOf(3.50), "Mickey"));
+        kitchenItems.add(new OrderLineItem(Item.MUFFIN, BigDecimal.valueOf(3.50),"Goofy"));
+        final PlaceOrderCommand createOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, kitchenItems, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka
         producerMap.get("web-in").send(new ProducerRecord("web-in", jsonb.toJson(createOrderCommand)));
@@ -53,9 +50,5 @@ public class KafkaServiceKitchenOrderOnlyIT extends KafkaIT {
                     "The item should be either a " + Item.MUFFIN + " or a " + Item.CAKEPOP + " not a " + orderInEvent.item);
         });
 
-        // verify the number of new records
-        //assertEquals(2, newRecords.count());
-
     }
-*/
 }
