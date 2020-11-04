@@ -39,44 +39,39 @@ public class KafkaService {
     Emitter<String> webUpdatesOutEmitter;
 
     @Incoming("orders")
-    public CompletionStage<Void> onOrderIn(final Message message) {
-        String payload = (String) message.getPayload();
-        logger.debug("message received from orders topic: {}", payload);
+    public CompletionStage<Void> onOrderIn(final String message) {
+        logger.debug("message received from orders topic: {}", message);
 
-        JsonReader jsonReader = Json.createReader(new StringReader(payload));
+        JsonReader jsonReader = Json.createReader(new StringReader(message));
         JsonObject jsonObject = jsonReader.readObject();
 
         if(jsonObject.containsKey("commandType")){
             logger.info("command received from orders topic: {}", jsonObject.getString("commandType"));
-            final PlaceOrderCommand placeOrderCommand = JsonUtil.createPlaceOrderCommandFromJson(payload);
-            return handlePlaceOrderCommand(JsonUtil.createPlaceOrderCommandFromJson(message.getPayload().toString())).thenRun(()->{message.ack();});
+            final PlaceOrderCommand placeOrderCommand = JsonUtil.createPlaceOrderCommandFromJson(message);
+            return handlePlaceOrderCommand(JsonUtil.createPlaceOrderCommandFromJson(message));
         }else if (jsonObject.containsKey("eventType")) {
             String eventType = jsonObject.getString("eventType");
             logger.info("event received from orders topic: {}", eventType);
             switch (eventType) {
-                case "BEVERAGE_ORDER_IN":
-                    logger.info("ignoring {} event", eventType);
-                    return message.ack();
-                case "KITCHEN_ORDER_IN":
-                    logger.info("ignoring {} event", eventType);
-                    return message.ack();
                 case "BEVERAGE_ORDER_UP":
-                    return webUpdatesOutEmitter.send(JsonUtil.toDashboardUpdateReadyJson(payload)).toCompletableFuture().thenRun(()->{message.ack();});
+                    return webUpdatesOutEmitter.send(JsonUtil.toDashboardUpdateReadyJson(message));
                 case "KITCHEN_ORDER_UP":
-                    return webUpdatesOutEmitter.send(JsonUtil.toDashboardUpdateReadyJson(payload)).toCompletableFuture().thenRun(()->{message.ack();});
-                default:
-                    return null;
+                    return webUpdatesOutEmitter.send(JsonUtil.toDashboardUpdateReadyJson(message));
             }
         }
-        return null;
+        return CompletableFuture.completedFuture(null);
     }
 
-    CompletableFuture<Void> sendBaristaOrder(final LineItemEvent event) {
+    CompletionStage<Void> sendBaristaOrder(final LineItemEvent event) {
         logger.debug("sendBaristaOrder: {}", JsonUtil.toJson(event));
         return baristaOutEmitter.send(JsonUtil.toJson(event)).thenRun(() ->{
             logger.debug("sending web update {}", event);
             sendInProgressWebUpdate(event);
-        }).toCompletableFuture();
+        }).exceptionally(ex -> {
+            //TODO: Send web error message
+            sendInProgressWebUpdate(event);
+            return null;
+        });
     }
 
     CompletableFuture<Void> sendKitchenOrder(final LineItemEvent event) {
@@ -110,12 +105,14 @@ public class KafkaService {
         futures.add(persistOrder(orderCreatedEvent));
         orderCreatedEvent.getEvents().forEach(e ->{
             if (e.eventType.equals(EventType.BEVERAGE_ORDER_IN)) {
-                futures.add(sendBaristaOrder(e));
+                futures.add(sendBaristaOrder(e).toCompletableFuture());
             } else if (e.eventType.equals(EventType.KITCHEN_ORDER_IN)) {
+                //TODO: change
                 futures.add(sendKitchenOrder(e));
             }
         });
 
+        //TODO: change so that successful messages complete
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
                 .exceptionally(e -> {
                     logger.error(e.getMessage());

@@ -73,7 +73,7 @@ docker images -a | grep counter
 docker tag <<RESULT>> <<DOCKER_HUB_ID>>/quarkuscoffeeshop-counter:<<VERSION>>
 ```
 
-NOTE: Connection string for Replica Set: mongodb://mongodb:mongodb+srv@quarkus-coffeeshop-replica-set-0.quarkus-coffeeshop-replica-set-svc.quarkuscoffeeshop-demo.svc.cluster.local:27017,quarkus-coffeeshop-replica-set-1.quarkus-coffeeshop-replica-set-svc.quarkuscoffeeshop-demo.svc.cluster.local:27017,quarkus-coffeeshop-replica-set-2.quarkus-coffeeshop-replica-set-svc.quarkuscoffeeshop-demo.svc.cluster.local:27017/cafedb?replicaSet=quarkus-coffeeshop-replica-set
+    NOTE: Connection string for Replica Set: mongodb://mongodb:mongodb+srv@quarkus-coffeeshop-replica-set-0.quarkus-coffeeshop-replica-set-svc.quarkuscoffeeshop-demo.svc.cluster.local:27017,quarkus-coffeeshop-replica-set-1.quarkus-coffeeshop-replica-set-svc.quarkuscoffeeshop-demo.svc.cluster.local:27017,quarkus-coffeeshop-replica-set-2.quarkus-coffeeshop-replica-set-svc.quarkuscoffeeshop-demo.svc.cluster.local:27017/cafedb?replicaSet=quarkus-coffeeshop-replica-set
 
 ## CHANGELOG
 
