@@ -22,6 +22,8 @@ public class Order {
 
     OrderSource orderSource;
 
+    public String rewardsId;
+
     public List<LineItem> beverageLineItems = new ArrayList<>();
 
     public List<LineItem> kitchenLineItems = new ArrayList<>();
@@ -45,6 +47,7 @@ public class Order {
         // construct the OrderCreatedEvent
         OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent();
         orderCreatedEvent.order = order;
+
         if (order.getBeverageLineItems().size() >= 1) {
             order.beverageLineItems.forEach(b -> {
                 orderCreatedEvent.addEvent(new OrderInEvent(EventType.BEVERAGE_ORDER_IN, order.id, b.name, b.item));
@@ -65,6 +68,8 @@ public class Order {
         // build the order from the CreateOrderCommand
         Order order = new Order();
         order.id = placeOrderCommand.getId();
+        order.rewardsId = placeOrderCommand.getRewardsId();
+        order.orderSource = placeOrderCommand.getOrderSource();
         if (placeOrderCommand.getBaristaItems().isPresent()) {
             logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaItems().get().size());
             placeOrderCommand.getBaristaItems().get().forEach(v -> {
@@ -94,6 +99,7 @@ public class Order {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("id:", this.id)
+                .append("rewardsIf:", this.rewardsId)
                 .append("beverageLineItems", beverageLineItems.toString())
                 .append("kitchenLineItems", kitchenLineItems.toString()).toString();
     }
