@@ -20,12 +20,13 @@ public class JsonUtil {
     }
 
     public static String toDashboardUpdateReadyJson(String payload) {
-        logger.debug("converting payload to OrderReadyUpdate: {}", payload);
+        logger.debug("converting OrderReadyUpdate from {}", payload);
         OrderUpEvent orderUpEvent = jsonb.fromJson(payload, OrderUpEvent.class);
         return jsonb.toJson(new OrderReadyUpdate(orderUpEvent));
     }
 
     public static PlaceOrderCommand createPlaceOrderCommandFromJson(String payload) {
+        logger.debug("converting to PlaceOrderCommand from {}", payload);
         return jsonb.fromJson(payload, PlaceOrderCommand.class);
     }
 

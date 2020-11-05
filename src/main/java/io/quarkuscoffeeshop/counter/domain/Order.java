@@ -35,7 +35,7 @@ public class Order {
         this.beverageLineItems = beverageLineItems;
     }
 
-    public static OrderCreatedEvent handlePlaceOrderCommand(PlaceOrderCommand placeOrderCommand) {
+    public static OrderCreatedEvent handlePlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
         Order order = createOrderFromCommand(placeOrderCommand);
         return createOrderCreatedEvent(order);
     }
@@ -63,12 +63,14 @@ public class Order {
     }
 
     private static Order createOrderFromCommand(final PlaceOrderCommand placeOrderCommand) {
-        logger.debug("createOrderFromCommand: CreateOrderCommand {}", placeOrderCommand.toString());
+        logger.debug("received PlaceOrderCommand: {}", placeOrderCommand.toString());
 
         // build the order from the CreateOrderCommand
         Order order = new Order();
         order.id = placeOrderCommand.getId();
-        order.rewardsId = placeOrderCommand.getRewardsId();
+        if (placeOrderCommand.getRewardsId().isPresent()) {
+            order.rewardsId = placeOrderCommand.getRewardsId().get();
+        }
         order.orderSource = placeOrderCommand.getOrderSource();
         if (placeOrderCommand.getBaristaItems().isPresent()) {
             logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaItems().get().size());

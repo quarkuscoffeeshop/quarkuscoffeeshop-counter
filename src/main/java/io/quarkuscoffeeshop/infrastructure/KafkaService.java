@@ -46,7 +46,7 @@ public class KafkaService {
         JsonObject jsonObject = jsonReader.readObject();
 
         if(jsonObject.containsKey("commandType")){
-            logger.info("command received from orders topic: {}", jsonObject.getString("commandType"));
+            logger.info("{} received from orders topic", jsonObject.getString("commandType"));
             final PlaceOrderCommand placeOrderCommand = JsonUtil.createPlaceOrderCommandFromJson(message);
             return handlePlaceOrderCommand(JsonUtil.createPlaceOrderCommandFromJson(message));
         }else if (jsonObject.containsKey("eventType")) {
