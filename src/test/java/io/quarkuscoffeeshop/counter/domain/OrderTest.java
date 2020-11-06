@@ -16,6 +16,7 @@ public class OrderTest {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
+                null,
                 new ArrayList<OrderLineItem>(){{
                     add(new OrderLineItem(Item.CAPPUCCINO, BigDecimal.valueOf(3.75), "Kirk"));
                     add(new OrderLineItem(Item.COFFEE_WITH_ROOM, BigDecimal.valueOf(3.75),"Spock"));
@@ -39,10 +40,11 @@ public class OrderTest {
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
                 null,
+                null,
                 new ArrayList<OrderLineItem>(){{
                     add(new OrderLineItem(Item.CROISSANT, BigDecimal.valueOf(3.75), "Kirk"));
                     add(new OrderLineItem(Item.CAKEPOP, BigDecimal.valueOf(3.75),"Spock"));
-                }}, null);
+                }}, BigDecimal.valueOf(5.00));
         OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
 
         Assert.assertNotNull(orderCreatedEvent);
@@ -60,6 +62,7 @@ public class OrderTest {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
+                null,
                 new ArrayList<OrderLineItem>(){{
                     add(new OrderLineItem(Item.CAPPUCCINO, BigDecimal.valueOf(3.75), "Kirk"));
                     add(new OrderLineItem(Item.COFFEE_WITH_ROOM, BigDecimal.valueOf(3.75),"Spock"));

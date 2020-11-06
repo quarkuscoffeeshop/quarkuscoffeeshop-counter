@@ -45,7 +45,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends BaseOrderIT {
     @Test
     public void testOrderInBeveragesAndKitchen() throws InterruptedException {
 
-        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, baristaItems, kitchenItems, BigDecimal.valueOf(7.50));
+        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, baristaItems, kitchenItems, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka
         producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.toJson(placeOrderCommand)));
@@ -92,7 +92,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends BaseOrderIT {
     @Test
     public void testOrderInBeveragesOnly() throws InterruptedException {
 
-        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, baristaItems, null, BigDecimal.valueOf(7.50));
+        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, baristaItems, null, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka and wait
         producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(placeOrderCommand)));
@@ -128,7 +128,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends BaseOrderIT {
 
     @Test
     public void testOrderInKitchenOnly() throws InterruptedException{
-        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, kitchenItems, BigDecimal.valueOf(7.50));
+        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, null, kitchenItems, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka and wait
         producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(placeOrderCommand)));
