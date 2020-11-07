@@ -3,30 +3,35 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>quarkuscoffeeshop-parent</artifactId>
     <groupId>io.quarkuscoffeeshop</groupId>
+    <artifactId>quarkuscoffeeshop-parent</artifactId>
     <version>5.0.0-SNAPSHOT</version>
     <relativePath>../quarkuscoffeeshop-parent</relativePath>
   </parent>
   <groupId>io.quarkuscoffeeshop</groupId>
   <artifactId>quarkuscoffeeshop-counter</artifactId>
-  <version>4.0.0</version>
-  <properties />
-
-  <dependencyManagement />
+  <version>5.0.0-SNAPSHOT</version>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-universe-bom</artifactId>
+        <version>1.9.2.Final</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
-    <!-- Application Domain -->
     <dependency>
       <groupId>io.quarkuscoffeeshop</groupId>
       <artifactId>quarkuscoffeeshop-domain</artifactId>
     </dependency>
-    <!-- Testing -->
     <dependency>
       <groupId>io.quarkuscoffeeshop</groupId>
       <artifactId>quarkuscoffeeshop-testutils</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- Quarkus stuff -->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-core</artifactId>
@@ -51,7 +56,10 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-mongodb-panache</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jdbc-postgresql</artifactId>
+    </dependency>
   </dependencies>
   <build />
-  <profiles />
 </project>
