@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-@Entity @Table(name = "line_items")
+@Entity
 public class ReceiptLineItem extends PanacheEntity {
 
 
