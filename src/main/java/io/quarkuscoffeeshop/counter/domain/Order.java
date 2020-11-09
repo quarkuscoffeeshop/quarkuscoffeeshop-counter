@@ -35,7 +35,7 @@ public class Order {
         this.beverageLineItems = beverageLineItems;
     }
 
-    public static OrderCreatedEvent handlePlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
+    public static OrderCreatedEvent process(final PlaceOrderCommand placeOrderCommand) {
         Order order = createOrderFromCommand(placeOrderCommand);
         return createOrderCreatedEvent(order);
     }

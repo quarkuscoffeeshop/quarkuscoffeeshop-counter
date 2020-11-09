@@ -33,7 +33,6 @@ public class ReceiptLineItem extends PanacheEntity {
     @Override
     public String toString() {
         return new StringJoiner(", ", ReceiptLineItem.class.getSimpleName() + "[", "]")
-                .add("receipt=" + receipt)
                 .add("item=" + item)
                 .add("name='" + name + "'")
                 .toString();

@@ -4,6 +4,7 @@ import io.quarkuscoffeeshop.domain.*;
 import io.quarkuscoffeeshop.counter.domain.*;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.eclipse.microprofile.context.ManagedExecutor;
+import org.eclipse.microprofile.context.ThreadContext;
 import org.eclipse.microprofile.reactive.messaging.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.transaction.Transactional;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +27,9 @@ public class KafkaService {
     final Logger logger = LoggerFactory.getLogger(KafkaService.class);
 
     @Inject
-    ManagedExecutor managedExecutor;
+    ThreadContext threadContext;
+
+    @Inject ManagedExecutor managedExecutor;
 
     @Inject
     OrderRepository orderRepository;
@@ -45,7 +49,7 @@ public class KafkaService {
     @Channel("web-updates-out")
     Emitter<String> webUpdatesOutEmitter;
 
-    @Incoming("orders")
+    @Incoming("orders") @Transactional
     public CompletionStage<Void> onOrderIn(final String message) {
         logger.debug("message received from orders topic: {}", message);
 
@@ -55,7 +59,11 @@ public class KafkaService {
         if(jsonObject.containsKey("commandType")){
             logger.info("{} received from orders topic", jsonObject.getString("commandType"));
             final PlaceOrderCommand placeOrderCommand = JsonUtil.createPlaceOrderCommandFromJson(message);
-            return handlePlaceOrderCommand(JsonUtil.createPlaceOrderCommandFromJson(message));
+//            return threadContext.withContextCapture(handlePlaceOrderCommand(JsonUtil.createPlaceOrderCommandFromJson(message)));
+            return managedExecutor.supplyAsync(() -> {
+                handlePlaceOrderCommand(JsonUtil.createPlaceOrderCommandFromJson(message));
+                return null;
+            });
         }else if (jsonObject.containsKey("eventType")) {
             String eventType = jsonObject.getString("eventType");
             logger.info("event received from orders topic: {}", eventType);
@@ -102,40 +110,32 @@ public class KafkaService {
         }).exceptionally(e -> { logger.error(e.getMessage()); return null; }).toCompletableFuture();
     }
 
-    CompletionStage<Void> persistReceipt(Receipt receipt) {
+    CompletableFuture<Void> persistReceipt(Receipt receipt) {
         return CompletableFuture.runAsync(() -> {
+            logger.debug("persisting {}", receipt);
             receiptRepository.persist(receipt);
             logger.debug("persisted {}", receipt);
-        }).exceptionally(ex -> {
-            logger.error("error persisting {}: {}", receipt, ex.getMessage());
-            return null;
         });
     }
-
 
     protected CompletionStage<Void> handlePlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
 
         logger.debug("PlaceOrderCommand received: {}", placeOrderCommand);
         // Get the event from the Order domain object
-        OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
+        OrderCreatedEvent orderCreatedEvent = Order.process(placeOrderCommand);
 //        orderRepository.persist(orderCreatedEvent.order);
 
-//        receiptRepository.persist(orderCreatedEvent.getReceipt());
-        managedExecutor.submit(() ->{
-            logger.debug("persisting {}", orderCreatedEvent.getReceipt());
-            receiptRepository.persist(orderCreatedEvent.getReceipt());
-            logger.debug("persisted {}", orderCreatedEvent.getReceipt());
-        });
+        receiptRepository.persist(orderCreatedEvent.getReceipt());
 
         Collection<CompletableFuture<Void>> futures = new ArrayList<>((orderCreatedEvent.getEvents().size() * 2) + 1);
 //        futures.add(persistOrder(orderCreatedEvent.order));
-//        futures.add(persistReceipt(orderCreatedEvent.getReceipt()));
+        futures.add(persistReceipt(orderCreatedEvent.getReceipt()));
         orderCreatedEvent.getEvents().forEach(e ->{
             if (e.eventType.equals(EventType.BEVERAGE_ORDER_IN)) {
                 futures.add(sendBaristaOrder(e).toCompletableFuture());
             } else if (e.eventType.equals(EventType.KITCHEN_ORDER_IN)) {
                 //TODO: change
-                futures.add(sendKitchenOrder(e));
+                futures.add(sendKitchenOrder(e).toCompletableFuture());
             }
         });
 

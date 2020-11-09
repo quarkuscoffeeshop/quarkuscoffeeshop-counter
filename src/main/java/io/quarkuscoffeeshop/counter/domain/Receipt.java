@@ -1,6 +1,7 @@
 package io.quarkuscoffeeshop.counter.domain;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ public class Receipt extends PanacheEntity {
 
     private BigDecimal total;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "receipt")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "receipt", cascade = CascadeType.ALL)
     private List<ReceiptLineItem> lineItems;
 
     public Receipt(BigDecimal total, List<ReceiptLineItem> lineItems) {

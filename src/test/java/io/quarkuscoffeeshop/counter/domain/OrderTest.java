@@ -24,7 +24,7 @@ public class OrderTest {
                 }},
                 null,
                 BigDecimal.valueOf(7.50));
-        OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
+        OrderCreatedEvent orderCreatedEvent = Order.process(placeOrderCommand);
         Assert.assertNotNull(orderCreatedEvent);
         Assert.assertNotNull(orderCreatedEvent.events);
         Assert.assertEquals(2, orderCreatedEvent.events.size());
@@ -47,7 +47,7 @@ public class OrderTest {
                     add(new OrderLineItem(Item.CROISSANT, BigDecimal.valueOf(3.75), "Kirk"));
                     add(new OrderLineItem(Item.CAKEPOP, BigDecimal.valueOf(3.75),"Spock"));
                 }}, BigDecimal.valueOf(5.00));
-        OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
+        OrderCreatedEvent orderCreatedEvent = Order.process(placeOrderCommand);
 
         Assert.assertNotNull(orderCreatedEvent);
         Assert.assertNotNull(orderCreatedEvent.events);
@@ -75,7 +75,7 @@ public class OrderTest {
                     add(new OrderLineItem(Item.CAKEPOP, BigDecimal.valueOf(3.75),"Spock"));
                 }},
                 BigDecimal.valueOf(15));
-        OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
+        OrderCreatedEvent orderCreatedEvent = Order.process(placeOrderCommand);
 
         Assert.assertNotNull(orderCreatedEvent);
         Assert.assertNotNull(orderCreatedEvent.events);
