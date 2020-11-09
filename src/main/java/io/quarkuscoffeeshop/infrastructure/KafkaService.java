@@ -6,6 +6,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.eclipse.microprofile.context.ThreadContext;
 import org.eclipse.microprofile.reactive.messaging.*;
+import org.mvel2.ast.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,12 +103,12 @@ public class KafkaService {
         return webUpdatesOutEmitter.send(JsonUtil.toInProgressUpdate(event)).toCompletableFuture();
     }
 
-    CompletableFuture<Void> persistOrder(Order order) {
-
+    CompletableFuture<Void> persistOrder(final OrderCreatedEvent orderCreatedEvent) {
         return CompletableFuture.runAsync(() -> {
-            orderRepository.persist(order);
-            logger.debug("persisted {}", order);
-        }).exceptionally(e -> { logger.error(e.getMessage()); return null; }).toCompletableFuture();
+            logger.debug("persisting {}", orderCreatedEvent);
+            orderRepository.persist(orderCreatedEvent);
+            logger.debug("persisted {}", orderCreatedEvent);
+        });
     }
 
     CompletableFuture<Void> persistReceipt(Receipt receipt) {
@@ -123,13 +124,13 @@ public class KafkaService {
         logger.debug("PlaceOrderCommand received: {}", placeOrderCommand);
         // Get the event from the Order domain object
         OrderCreatedEvent orderCreatedEvent = Order.process(placeOrderCommand);
-//        orderRepository.persist(orderCreatedEvent.order);
+        orderRepository.persist(orderCreatedEvent);
+        receiptRepository.persist(Order.createReceipt(orderCreatedEvent.order));
 
-        receiptRepository.persist(orderCreatedEvent.getReceipt());
 
         Collection<CompletableFuture<Void>> futures = new ArrayList<>((orderCreatedEvent.getEvents().size() * 2) + 1);
 //        futures.add(persistOrder(orderCreatedEvent.order));
-        futures.add(persistReceipt(orderCreatedEvent.getReceipt()));
+//        futures.add(persistReceipt(orderCreatedEvent.getReceipt()));
         orderCreatedEvent.getEvents().forEach(e ->{
             if (e.eventType.equals(EventType.BEVERAGE_ORDER_IN)) {
                 futures.add(sendBaristaOrder(e).toCompletableFuture());

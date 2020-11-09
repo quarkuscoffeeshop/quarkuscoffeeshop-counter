@@ -11,17 +11,17 @@ import java.util.StringJoiner;
 
 @RegisterForReflection
 @Entity
-public class CoffeeshopEvent extends PanacheEntity {
+public class OrderEvent extends PanacheEntity {
 
     EventType eventType;
 
     @Lob
     String eventPayload;
 
-    public CoffeeshopEvent() {
+    public OrderEvent() {
     }
 
-    public CoffeeshopEvent(EventType eventType, String eventPayload) {
+    public OrderEvent(EventType eventType, String eventPayload) {
         this.id = id;
         this.eventPayload = eventPayload;
         this.eventType = eventType;
@@ -29,7 +29,7 @@ public class CoffeeshopEvent extends PanacheEntity {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", CoffeeshopEvent.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", OrderEvent.class.getSimpleName() + "[", "]")
                 .add("id=" + id)
                 .add("eventType=" + eventType)
                 .add("eventPayload='" + eventPayload + "'")
@@ -40,7 +40,7 @@ public class CoffeeshopEvent extends PanacheEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CoffeeshopEvent that = (CoffeeshopEvent) o;
+        OrderEvent that = (OrderEvent) o;
         return eventType == that.eventType &&
                 Objects.equals(eventPayload, that.eventPayload);
     }

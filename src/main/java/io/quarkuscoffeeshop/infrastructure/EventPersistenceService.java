@@ -1,11 +1,10 @@
 package io.quarkuscoffeeshop.infrastructure;
 
 import io.quarkuscoffeeshop.counter.domain.CoffeeshopCommand;
-import io.quarkuscoffeeshop.counter.domain.CoffeeshopEvent;
+import io.quarkuscoffeeshop.counter.domain.OrderEvent;
 import io.quarkuscoffeeshop.domain.CommandType;
 import io.quarkuscoffeeshop.domain.EventType;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +36,10 @@ public class EventPersistenceService {
             JsonReader jsonReader = Json.createReader(new StringReader(message));
             JsonObject jsonObject = jsonReader.readObject();
             if (jsonObject.containsKey("eventType")){
-                CoffeeshopEvent coffeeshopEvent = new CoffeeshopEvent(
+                OrderEvent orderEvent = new OrderEvent(
                         EventType.valueOf(jsonObject.getString("eventType")), message);
-                logger.debug("CoffeeshopEvent {}", coffeeshopEvent);
-                coffeeshopEventRepository.persist(coffeeshopEvent);
+                logger.debug("CoffeeshopEvent {}", orderEvent);
+                coffeeshopEventRepository.persist(orderEvent);
             }else if(jsonObject.containsKey("commandType")){
                 CoffeeshopCommand coffeeshopCommand = new CoffeeshopCommand(
                         CommandType.valueOf(jsonObject.getString("commandType")), message);

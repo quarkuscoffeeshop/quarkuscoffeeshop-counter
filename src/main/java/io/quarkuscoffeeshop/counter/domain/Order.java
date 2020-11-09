@@ -40,7 +40,7 @@ public class Order {
         return createOrderCreatedEvent(order);
     }
 
-    static Receipt createReceipt(final Order order) {
+    public static Receipt createReceipt(final Order order) {
         Receipt receipt = new Receipt();
         order.beverageLineItems.forEach(beverageLineItem -> {
             ReceiptLineItem receiptLineItem = new ReceiptLineItem(receipt, beverageLineItem.item, beverageLineItem.name);
@@ -60,7 +60,6 @@ public class Order {
         // construct the OrderCreatedEvent
         OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent();
         orderCreatedEvent.order = order;
-        orderCreatedEvent.setReceipt(createReceipt(order));
 
         if (order.getBeverageLineItems().size() >= 1) {
             order.beverageLineItems.forEach(b -> {
