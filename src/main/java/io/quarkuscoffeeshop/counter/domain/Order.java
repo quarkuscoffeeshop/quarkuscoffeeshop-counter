@@ -40,13 +40,27 @@ public class Order {
         return createOrderCreatedEvent(order);
     }
 
+    static Receipt createReceipt(final Order order) {
+        Receipt receipt = new Receipt();
+        order.beverageLineItems.forEach(beverageLineItem -> {
+            ReceiptLineItem receiptLineItem = new ReceiptLineItem(receipt, beverageLineItem.item, beverageLineItem.name);
+            receipt.addLineItem(receiptLineItem);
+        });
+        order.kitchenLineItems.forEach(beverageLineItem -> {
+            ReceiptLineItem receiptLineItem = new ReceiptLineItem(receipt, beverageLineItem.item, beverageLineItem.name);
+        });
+        return receipt;
+    }
+
     /*
         Creates the Value Objects associated with a new Order
      */
     private static OrderCreatedEvent createOrderCreatedEvent(final Order order) {
+
         // construct the OrderCreatedEvent
         OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent();
         orderCreatedEvent.order = order;
+        orderCreatedEvent.setReceipt(createReceipt(order));
 
         if (order.getBeverageLineItems().size() >= 1) {
             order.beverageLineItems.forEach(b -> {
@@ -68,10 +82,10 @@ public class Order {
         // build the order from the CreateOrderCommand
         Order order = new Order();
         order.id = placeOrderCommand.getId();
+        order.orderSource = placeOrderCommand.getOrderSource();
         if (placeOrderCommand.getRewardsId().isPresent()) {
             order.rewardsId = placeOrderCommand.getRewardsId().get();
         }
-        order.orderSource = placeOrderCommand.getOrderSource();
         if (placeOrderCommand.getBaristaItems().isPresent()) {
             logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaItems().get().size());
             placeOrderCommand.getBaristaItems().get().forEach(v -> {

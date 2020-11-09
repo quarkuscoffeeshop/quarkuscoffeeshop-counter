@@ -28,7 +28,7 @@ public class KafkaServiceBaristaOrderOnlyIT extends BaseOrderIT {
         final List<OrderLineItem> beverages = new ArrayList<>();
         beverages.add(new OrderLineItem(Item.COFFEE_WITH_ROOM, BigDecimal.valueOf(3.5), "Kirk"));
         beverages.add(new OrderLineItem(Item.ESPRESSO_DOUBLE, BigDecimal.valueOf(5.5), "Spock"));
-        final PlaceOrderCommand createOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, beverages, null, BigDecimal.valueOf(7.50));
+        final PlaceOrderCommand createOrderCommand = new PlaceOrderCommand(OrderSource.WEB, "testStoreId", null, beverages, null, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka and wait
         producerMap.get("web-in").send(new ProducerRecord("web-in", jsonb.toJson(createOrderCommand)));

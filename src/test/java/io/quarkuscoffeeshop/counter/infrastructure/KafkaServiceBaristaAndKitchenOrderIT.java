@@ -1,21 +1,16 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
-import io.quarkuscoffeeshop.domain.*;
-import io.quarkuscoffeeshop.infrastructure.*;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
-import io.quarkuscoffeeshop.counter.domain.Order;
+import io.quarkuscoffeeshop.domain.*;
+import io.quarkuscoffeeshop.infrastructure.CafeITResource;
 import io.quarkuscoffeeshop.infrastructure.JsonUtil;
-import io.quarkuscoffeeshop.infrastructure.OrderRepository;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -23,10 +18,12 @@ import javax.json.JsonReader;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 
 @QuarkusTest
 @QuarkusTestResource(CafeITResource.class)
@@ -45,7 +42,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends BaseOrderIT {
     @Test
     public void testOrderInBeveragesAndKitchen() throws InterruptedException {
 
-        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, baristaItems, kitchenItems, BigDecimal.valueOf(7.50));
+        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, "testStoreId",null, baristaItems, kitchenItems, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka
         producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.toJson(placeOrderCommand)));
@@ -92,7 +89,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends BaseOrderIT {
     @Test
     public void testOrderInBeveragesOnly() throws InterruptedException {
 
-        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, baristaItems, null, BigDecimal.valueOf(7.50));
+        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB,  "testStoreId", null, baristaItems, null, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka and wait
         producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(placeOrderCommand)));
@@ -128,7 +125,7 @@ public class KafkaServiceBaristaAndKitchenOrderIT extends BaseOrderIT {
 
     @Test
     public void testOrderInKitchenOnly() throws InterruptedException{
-        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, null, kitchenItems, BigDecimal.valueOf(7.50));
+        final PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(OrderSource.WEB,  "testStoreId",null, null, kitchenItems, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka and wait
         producerMap.get("orders").send(new ProducerRecord("orders", JsonUtil.jsonb.toJson(placeOrderCommand)));

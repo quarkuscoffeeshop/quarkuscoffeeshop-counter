@@ -2,16 +2,19 @@ package io.quarkuscoffeeshop.counter.domain;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkuscoffeeshop.domain.Item;
+import io.quarkuscoffeeshop.domain.LineItem;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-@Entity
+@Entity @Table(name="line_items")
 public class ReceiptLineItem extends PanacheEntity {
 
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="receipt_id",nullable = false)
     private Receipt receipt;
 
     private Item item;
@@ -33,7 +36,6 @@ public class ReceiptLineItem extends PanacheEntity {
                 .add("receipt=" + receipt)
                 .add("item=" + item)
                 .add("name='" + name + "'")
-                .add("id=" + id)
                 .toString();
     }
 

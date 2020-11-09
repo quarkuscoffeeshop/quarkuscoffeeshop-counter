@@ -1,16 +1,17 @@
 package io.quarkuscoffeeshop.counter.domain;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.mongodb.panache.PanacheMongoEntity;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.quarkuscoffeeshop.domain.EventType;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Lob;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-public class CoffeeshopEvent extends PanacheMongoEntity {
+@RegisterForReflection
+@Entity
+public class CoffeeshopEvent extends PanacheEntity {
 
     EventType eventType;
 

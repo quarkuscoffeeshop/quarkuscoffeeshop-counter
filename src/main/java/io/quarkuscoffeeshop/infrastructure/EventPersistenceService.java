@@ -15,6 +15,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import java.io.StringReader;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
@@ -29,24 +30,23 @@ public class EventPersistenceService {
     CoffeeShopCommandRepository coffeeShopCommandRepository;
 
     @Incoming("order-events")
-    public CompletionStage<Void> recordOrderEvent(final Message message) {
-        logger.debug("recordOrderEvent {}", message.getPayload());
-        String payload = (String) message.getPayload();
-        logger.debug("raw payload {}", payload);
-        JsonReader jsonReader = Json.createReader(new StringReader(payload));
-        JsonObject jsonObject = jsonReader.readObject();
-        logger.debug("unmarshalled {}", jsonObject);
-        if (jsonObject.containsKey("eventType")){
-            CoffeeshopEvent coffeeshopEvent = new CoffeeshopEvent(
-                    EventType.valueOf(jsonObject.getString("eventType")), payload);
-            logger.debug("CoffeeshopEvent {}", coffeeshopEvent);
-            coffeeshopEventRepository.persist(coffeeshopEvent);
-        }else if(jsonObject.containsKey("commandType")){
-            CoffeeshopCommand coffeeshopCommand = new CoffeeshopCommand(
-                    CommandType.valueOf(jsonObject.getString("commandType")), payload);
-            logger.debug("CoffeeshopCommand {}", coffeeshopCommand);
-            coffeeShopCommandRepository.persist(coffeeshopCommand);
-        }
-        return message.ack();
+    public CompletionStage<Void> recordOrderEvent(final String message) {
+
+        return CompletableFuture.runAsync(() -> {
+            logger.debug("recordOrderEvent {}", message);
+            JsonReader jsonReader = Json.createReader(new StringReader(message));
+            JsonObject jsonObject = jsonReader.readObject();
+            if (jsonObject.containsKey("eventType")){
+                CoffeeshopEvent coffeeshopEvent = new CoffeeshopEvent(
+                        EventType.valueOf(jsonObject.getString("eventType")), message);
+                logger.debug("CoffeeshopEvent {}", coffeeshopEvent);
+                coffeeshopEventRepository.persist(coffeeshopEvent);
+            }else if(jsonObject.containsKey("commandType")){
+                CoffeeshopCommand coffeeshopCommand = new CoffeeshopCommand(
+                        CommandType.valueOf(jsonObject.getString("commandType")), message);
+                logger.debug("CoffeeshopCommand {}", coffeeshopCommand);
+                coffeeShopCommandRepository.persist(coffeeshopCommand);
+            }
+        });
     }
 }

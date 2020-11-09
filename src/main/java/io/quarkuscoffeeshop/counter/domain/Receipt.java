@@ -4,6 +4,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -13,7 +14,7 @@ public class Receipt extends PanacheEntity {
 
     private BigDecimal total;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "receipt")
     private List<ReceiptLineItem> lineItems;
 
     public Receipt(BigDecimal total, List<ReceiptLineItem> lineItems) {
@@ -23,6 +24,13 @@ public class Receipt extends PanacheEntity {
 
     public Receipt() {
 
+    }
+
+    public void addLineItem(final ReceiptLineItem receiptLineItem) {
+        if (lineItems == null) {
+            lineItems = new ArrayList<>();
+        }
+        lineItems.add(receiptLineItem);
     }
 
     @Override
@@ -63,4 +71,5 @@ public class Receipt extends PanacheEntity {
     public void setLineItems(List<ReceiptLineItem> lineItems) {
         this.lineItems = lineItems;
     }
+
 }

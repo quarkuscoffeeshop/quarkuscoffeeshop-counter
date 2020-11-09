@@ -3,6 +3,7 @@ package io.quarkuscoffeeshop.infrastructure;
 import io.quarkuscoffeeshop.domain.*;
 import io.quarkuscoffeeshop.counter.domain.*;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import org.eclipse.microprofile.context.ManagedExecutor;
 import org.eclipse.microprofile.reactive.messaging.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,13 @@ public class KafkaService {
     final Logger logger = LoggerFactory.getLogger(KafkaService.class);
 
     @Inject
+    ManagedExecutor managedExecutor;
+
+    @Inject
     OrderRepository orderRepository;
+
+    @Inject
+    ReceiptRepository receiptRepository;
 
     @Inject
     @Channel("barista-out")
@@ -87,12 +94,24 @@ public class KafkaService {
         return webUpdatesOutEmitter.send(JsonUtil.toInProgressUpdate(event)).toCompletableFuture();
     }
 
-    CompletableFuture<Void> persistOrder(final OrderCreatedEvent orderCreatedEvent) {
+    CompletableFuture<Void> persistOrder(Order order) {
 
         return CompletableFuture.runAsync(() -> {
-            orderRepository.persist(orderCreatedEvent.order);
+            orderRepository.persist(order);
+            logger.debug("persisted {}", order);
         }).exceptionally(e -> { logger.error(e.getMessage()); return null; }).toCompletableFuture();
     }
+
+    CompletionStage<Void> persistReceipt(Receipt receipt) {
+        return CompletableFuture.runAsync(() -> {
+            receiptRepository.persist(receipt);
+            logger.debug("persisted {}", receipt);
+        }).exceptionally(ex -> {
+            logger.error("error persisting {}: {}", receipt, ex.getMessage());
+            return null;
+        });
+    }
+
 
     protected CompletionStage<Void> handlePlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
 
@@ -101,8 +120,16 @@ public class KafkaService {
         OrderCreatedEvent orderCreatedEvent = Order.handlePlaceOrderCommand(placeOrderCommand);
 //        orderRepository.persist(orderCreatedEvent.order);
 
+//        receiptRepository.persist(orderCreatedEvent.getReceipt());
+        managedExecutor.submit(() ->{
+            logger.debug("persisting {}", orderCreatedEvent.getReceipt());
+            receiptRepository.persist(orderCreatedEvent.getReceipt());
+            logger.debug("persisted {}", orderCreatedEvent.getReceipt());
+        });
+
         Collection<CompletableFuture<Void>> futures = new ArrayList<>((orderCreatedEvent.getEvents().size() * 2) + 1);
-        futures.add(persistOrder(orderCreatedEvent));
+//        futures.add(persistOrder(orderCreatedEvent.order));
+//        futures.add(persistReceipt(orderCreatedEvent.getReceipt()));
         orderCreatedEvent.getEvents().forEach(e ->{
             if (e.eventType.equals(EventType.BEVERAGE_ORDER_IN)) {
                 futures.add(sendBaristaOrder(e).toCompletableFuture());

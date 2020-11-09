@@ -13,6 +13,8 @@ public class OrderCreatedEvent {
 
     public Order order;
 
+    private Receipt receipt;
+
     public List<LineItemEvent> events = new ArrayList<>();
 
     public void addEvent(LineItemEvent orderEvent) {
@@ -56,5 +58,13 @@ public class OrderCreatedEvent {
     @Override
     public int hashCode() {
         return Objects.hash(order, events);
+    }
+
+    public Receipt getReceipt() {
+        return receipt;
+    }
+
+    public void setReceipt(Receipt receipt) {
+        this.receipt = receipt;
     }
 }

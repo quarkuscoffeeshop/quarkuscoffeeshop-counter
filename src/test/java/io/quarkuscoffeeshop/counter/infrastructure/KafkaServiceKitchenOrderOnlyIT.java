@@ -29,7 +29,7 @@ public class KafkaServiceKitchenOrderOnlyIT extends BaseOrderIT {
         final List<OrderLineItem> kitchenItems = new ArrayList<>();
         kitchenItems.add(new OrderLineItem(Item.CAKEPOP, BigDecimal.valueOf(3.50), "Mickey"));
         kitchenItems.add(new OrderLineItem(Item.MUFFIN, BigDecimal.valueOf(3.50),"Goofy"));
-        final PlaceOrderCommand createOrderCommand = new PlaceOrderCommand(OrderSource.WEB, null, null, kitchenItems, BigDecimal.valueOf(7.50));
+        final PlaceOrderCommand createOrderCommand = new PlaceOrderCommand(OrderSource.WEB, "testStoreId", null, null, kitchenItems, BigDecimal.valueOf(7.50));
 
         // send the order to Kafka
         producerMap.get("web-in").send(new ProducerRecord("web-in", jsonb.toJson(createOrderCommand)));

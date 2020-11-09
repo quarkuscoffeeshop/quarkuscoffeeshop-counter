@@ -16,6 +16,7 @@ public class OrderTest {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
+                "testStoreId",
                 null,
                 new ArrayList<OrderLineItem>(){{
                     add(new OrderLineItem(Item.CAPPUCCINO, BigDecimal.valueOf(3.75), "Kirk"));
@@ -39,6 +40,7 @@ public class OrderTest {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
+                "testStoreId",
                 null,
                 null,
                 new ArrayList<OrderLineItem>(){{
@@ -62,6 +64,7 @@ public class OrderTest {
 
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
+                "testStoreId",
                 null,
                 new ArrayList<OrderLineItem>(){{
                     add(new OrderLineItem(Item.CAPPUCCINO, BigDecimal.valueOf(3.75), "Kirk"));

@@ -1,15 +1,18 @@
 package io.quarkuscoffeeshop.counter.domain;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.quarkuscoffeeshop.domain.CommandType;
 
+import javax.persistence.Entity;
 import javax.persistence.Lob;
 import java.util.Objects;
 import java.util.StringJoiner;
 
 @RegisterForReflection
-public class CoffeeshopCommand extends PanacheMongoEntity {
+@Entity
+public class CoffeeshopCommand extends PanacheEntity {
 
     CommandType commandType;
 
