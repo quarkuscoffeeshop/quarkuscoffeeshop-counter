@@ -18,6 +18,7 @@ public class ReceiptLineItem extends PanacheEntity {
     @JoinColumn(name="orderId",nullable = false)
     private Receipt receipt;
 
+    @Enumerated(EnumType.STRING)
     private Item item;
 
     private String name;
