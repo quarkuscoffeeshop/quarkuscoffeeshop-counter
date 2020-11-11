@@ -42,6 +42,7 @@ public class Order {
 
     public static Receipt createReceipt(final Order order) {
         Receipt receipt = new Receipt();
+        receipt.setOrderId(order.id);
         order.beverageLineItems.forEach(beverageLineItem -> {
             ReceiptLineItem receiptLineItem = new ReceiptLineItem(receipt, beverageLineItem.item, beverageLineItem.name);
             receipt.addLineItem(receiptLineItem);

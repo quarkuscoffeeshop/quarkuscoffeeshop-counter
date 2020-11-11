@@ -1,8 +1,10 @@
 package io.quarkuscoffeeshop.counter.domain;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import org.hibernate.annotations.Cascade;
 
+import javax.json.bind.annotation.JsonbTransient;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,15 +12,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-@Entity @Table(name = "receipts")
-public class Receipt extends PanacheEntity {
+@Entity @Table(name = "Receipts")
+public class Receipt extends PanacheEntityBase {
+
+    @Id @Column(nullable = false, name = "orderId")
+    private String orderId;
 
     private BigDecimal total;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "receipt", cascade = CascadeType.ALL)
     private List<ReceiptLineItem> lineItems;
 
-    public Receipt(BigDecimal total, List<ReceiptLineItem> lineItems) {
+    public Receipt(String orderId, BigDecimal total, List<ReceiptLineItem> lineItems) {
+        this.orderId = orderId;
         this.total = total;
         this.lineItems = lineItems;
     }
@@ -37,9 +43,9 @@ public class Receipt extends PanacheEntity {
     @Override
     public String toString() {
         return new StringJoiner(", ", Receipt.class.getSimpleName() + "[", "]")
+                .add("orderId=" + orderId)
                 .add("total=" + total)
                 .add("lineItems=" + lineItems)
-                .add("id=" + id)
                 .toString();
     }
 
@@ -52,9 +58,10 @@ public class Receipt extends PanacheEntity {
                 Objects.equals(lineItems, receipt.lineItems);
     }
 
+
     @Override
     public int hashCode() {
-        return Objects.hash(total, lineItems);
+        return Objects.hash(orderId, total);
     }
 
     public BigDecimal getTotal() {
@@ -73,4 +80,11 @@ public class Receipt extends PanacheEntity {
         this.lineItems = lineItems;
     }
 
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
 }

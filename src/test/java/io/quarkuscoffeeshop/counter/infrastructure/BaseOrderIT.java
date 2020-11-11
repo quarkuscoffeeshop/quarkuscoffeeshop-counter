@@ -29,9 +29,11 @@ public abstract class BaseOrderIT extends KafkaIT {
 
     @BeforeEach
     public void setup() {
+/*
         Mockito.doAnswer(new TestUtil.AssignIdToEntityAnswer(UUID.randomUUID().toString())).when(orderRepository).persist(any(Order.class));
         Mockito.doAnswer(new TestUtil.AssignIdToEntityAnswer(UUID.randomUUID().toString())).when(coffeeshopEventRepository).persist(any(OrderEvent.class));
         Mockito.doAnswer(new TestUtil.AssignIdToEntityAnswer(UUID.randomUUID().toString())).when(coffeeShopCommandRepository).persist(any(CoffeeshopCommand.class));
+*/
     }
 
 }

@@ -4,17 +4,18 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkuscoffeeshop.domain.Item;
 import io.quarkuscoffeeshop.domain.LineItem;
 
+import javax.json.bind.annotation.JsonbTransient;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-@Entity @Table(name="line_items")
+@Entity @Table(name="LineItems")
 public class ReceiptLineItem extends PanacheEntity {
 
-
+    @JsonbTransient
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="receipt_id",nullable = false)
+    @JoinColumn(name="orderId",nullable = false)
     private Receipt receipt;
 
     private Item item;
