@@ -1,12 +1,20 @@
 package io.quarkuscoffeeshop.infrastructure;
 
-import io.quarkuscoffeeshop.domain.*;
-import io.quarkuscoffeeshop.counter.domain.*;
+import javax.enterprise.event.Event;
+import io.debezium.outbox.quarkus.ExportedEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import io.quarkuscoffeeshop.counter.domain.Order;
+import io.quarkuscoffeeshop.counter.domain.OrderCreatedEvent;
+import io.quarkuscoffeeshop.counter.domain.Receipt;
+import io.quarkuscoffeeshop.domain.EventType;
+import io.quarkuscoffeeshop.domain.LineItemEvent;
+import io.quarkuscoffeeshop.domain.OrderPlacedEvent;
+import io.quarkuscoffeeshop.domain.PlaceOrderCommand;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.eclipse.microprofile.context.ThreadContext;
-import org.eclipse.microprofile.reactive.messaging.*;
-import org.mvel2.ast.Or;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +37,9 @@ public class KafkaService {
 
     @Inject
     ThreadContext threadContext;
+
+    @Inject
+    Event<ExportedEvent<?, ?>> event;
 
     @Inject ManagedExecutor managedExecutor;
 
@@ -123,9 +134,9 @@ public class KafkaService {
 
         logger.debug("PlaceOrderCommand received: {}", placeOrderCommand);
         // Get the event from the Order domain object
-        OrderCreatedEvent orderCreatedEvent = Order.process(placeOrderCommand);
-        orderRepository.persist(orderCreatedEvent);
-        receiptRepository.persist(Order.createReceipt(orderCreatedEvent.order));
+        OrderPlacedEvent orderPlacedEvent = Order.processPlaceOrderCommand(placeOrderCommand);
+        orderRepository.persist(orderPlacedEvent);
+        receiptRepository.persist(Order.createReceipt(orderPlacedEvent.getO));
 
 
         Collection<CompletableFuture<Void>> futures = new ArrayList<>((orderCreatedEvent.getEvents().size() * 2) + 1);

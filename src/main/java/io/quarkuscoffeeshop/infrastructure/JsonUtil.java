@@ -1,10 +1,12 @@
 package io.quarkuscoffeeshop.infrastructure;
 
+import io.quarkuscoffeeshop.counter.domain.Order;
 import io.quarkuscoffeeshop.domain.*;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 

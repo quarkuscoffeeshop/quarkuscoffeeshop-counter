@@ -14,17 +14,26 @@ public class OrderTest {
     @Test
     public void testOrderCreatedEventFromBeveragesOnly() {
 
+        String orderId = UUID.randomUUID().toString();
+
         PlaceOrderCommand placeOrderCommand = new PlaceOrderCommand(
                 OrderSource.WEB,
                 "testStoreId",
                 null,
-                new ArrayList<OrderLineItem>(){{
-                    add(new OrderLineItem(Item.CAPPUCCINO, BigDecimal.valueOf(3.75), "Kirk"));
-                    add(new OrderLineItem(Item.COFFEE_WITH_ROOM, BigDecimal.valueOf(3.75),"Spock"));
+                new ArrayList<LineItem>(){{
+                    add(new LineItem(
+                            orderId,
+                            UUID.randomUUID().toString(),
+                            Item.CAPPUCCINO,
+                            "Kirk"));
+                    add(new LineItem(
+                            orderId,
+                            UUID.randomUUID().toString(),
+                            Item.COFFEE_WITH_ROOM,
+                            "Spock"));
                 }},
-                null,
                 BigDecimal.valueOf(7.50));
-        OrderCreatedEvent orderCreatedEvent = Order.process(placeOrderCommand);
+        OrderCreatedEvent orderCreatedEvent = Order.processPlaceOrderCommand(placeOrderCommand);
         Assert.assertNotNull(orderCreatedEvent);
         Assert.assertNotNull(orderCreatedEvent.events);
         Assert.assertEquals(2, orderCreatedEvent.events.size());
@@ -47,7 +56,7 @@ public class OrderTest {
                     add(new OrderLineItem(Item.CROISSANT, BigDecimal.valueOf(3.75), "Kirk"));
                     add(new OrderLineItem(Item.CAKEPOP, BigDecimal.valueOf(3.75),"Spock"));
                 }}, BigDecimal.valueOf(5.00));
-        OrderCreatedEvent orderCreatedEvent = Order.process(placeOrderCommand);
+        OrderCreatedEvent orderCreatedEvent = Order.processPlaceOrderCommand(placeOrderCommand);
 
         Assert.assertNotNull(orderCreatedEvent);
         Assert.assertNotNull(orderCreatedEvent.events);
@@ -75,7 +84,7 @@ public class OrderTest {
                     add(new OrderLineItem(Item.CAKEPOP, BigDecimal.valueOf(3.75),"Spock"));
                 }},
                 BigDecimal.valueOf(15));
-        OrderCreatedEvent orderCreatedEvent = Order.process(placeOrderCommand);
+        OrderCreatedEvent orderCreatedEvent = Order.processPlaceOrderCommand(placeOrderCommand);
 
         Assert.assertNotNull(orderCreatedEvent);
         Assert.assertNotNull(orderCreatedEvent.events);

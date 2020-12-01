@@ -25,10 +25,6 @@
   <dependencies>
     <dependency>
       <groupId>io.quarkuscoffeeshop</groupId>
-      <artifactId>quarkuscoffeeshop-domain</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkuscoffeeshop</groupId>
       <artifactId>quarkuscoffeeshop-testutils</artifactId>
       <scope>test</scope>
     </dependency>
@@ -59,6 +55,22 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-jdbc-postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.debezium</groupId>
+      <artifactId>debezium-quarkus-outbox</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-vertx-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-jsonb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkuscoffeeshop</groupId>
+      <artifactId>quarkuscoffeeshop-domain</artifactId>
     </dependency>
   </dependencies>
   <build />

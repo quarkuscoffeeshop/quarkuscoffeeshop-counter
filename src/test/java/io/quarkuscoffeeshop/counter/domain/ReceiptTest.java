@@ -31,7 +31,7 @@ public class ReceiptTest {
         Order retVal = new Order();
         retVal.id = UUID.randomUUID().toString();
         retVal.orderSource = OrderSource.COUNTER;
-        retVal.beverageLineItems = mockBaristaItems();
+        retVal.baristaLineItems = mockBaristaItems();
         return retVal;
     }
 
