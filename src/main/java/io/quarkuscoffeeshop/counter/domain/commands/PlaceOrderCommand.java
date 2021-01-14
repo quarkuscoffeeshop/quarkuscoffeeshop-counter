@@ -23,9 +23,9 @@ public class PlaceOrderCommand {
 
   private final String loyaltyMemberId;
 
-  private final List<LineItem> baristaLineItems;
+  private final List<CommandItem> baristaLineItems;
 
-  private final List<LineItem> kitchenLineItems;
+  private final List<CommandItem> kitchenLineItems;
 
   private final Instant timestamp;
 
@@ -35,8 +35,8 @@ public class PlaceOrderCommand {
           @JsonProperty("orderSource") final OrderSource orderSource,
           @JsonProperty("location") final Location location,
           @JsonProperty("loyaltyMemberId") final String loyaltyMemberId,
-          @JsonProperty("baristaLineItems") Optional<List<LineItem>> baristaLineItems,
-          @JsonProperty("kitchenLineItems") Optional<List<LineItem>> kitchenLineItems) {
+          @JsonProperty("baristaLineItems") Optional<List<CommandItem>> baristaLineItems,
+          @JsonProperty("kitchenLineItems") Optional<List<CommandItem>> kitchenLineItems) {
     this.id = id;
     this.orderSource = orderSource;
     this.location = location;
@@ -80,11 +80,11 @@ public class PlaceOrderCommand {
     return Objects.hash(id, orderSource, location, loyaltyMemberId, baristaLineItems, kitchenLineItems, timestamp);
   }
 
-  public Optional<List<LineItem>> getBaristaLineItems() {
+  public Optional<List<CommandItem>> getBaristaLineItems() {
     return Optional.ofNullable(baristaLineItems);
   }
 
-  public Optional<List<LineItem>> getKitchenLineItems() {
+  public Optional<List<CommandItem>> getKitchenLineItems() {
     return Optional.ofNullable(kitchenLineItems);
   }
 

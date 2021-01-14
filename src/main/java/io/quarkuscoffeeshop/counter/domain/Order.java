@@ -131,31 +131,38 @@ public class Order extends PanacheEntityBase {
     Order order = new Order(placeOrderCommand.getId());
     order.setOrderSource(placeOrderCommand.getOrderSource());
     order.setTimestamp(placeOrderCommand.getTimestamp());
+    order.setOrderStatus(OrderStatus.IN_PROGRESS);
 
     if (placeOrderCommand.getBaristaLineItems().isPresent()) {
       logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaLineItems().get().size());
 
-      placeOrderCommand.getBaristaLineItems().get().forEach(v -> {
-        logger.debug("createOrderFromCommand adding baristaItem from {}", v.toString());
-        LineItem lineItem = new LineItem(v.getItem(), v.getName(), order);
+      logger.debug("adding Barista LineItems");
+      placeOrderCommand.getBaristaLineItems().get().forEach(commandItem -> {
+        logger.debug("createOrderFromCommand adding baristaItem from {}", commandItem.toString());
+        LineItem lineItem = new LineItem(commandItem.getItem(), commandItem.getName(), commandItem.getPrice(), LineItemStatus.IN_PROGRESS, order);
         order.addBaristaLineItem(lineItem);
+        logger.debug("added LineItem: {}", order.getBaristaLineItems().get().size());
         orderEventResult.addBaristaTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
-        orderEventResult.addUpdate(new OrderUpdate(lineItem.getOrder().getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
+        logger.debug("Added Barista Ticket to OrderEventResult: {}", orderEventResult.getBaristaTickets().get().size());
+        orderEventResult.addUpdate(new OrderUpdate(order.getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
+        logger.debug("Added Order Update to OrderEventResult: ", orderEventResult.getOrderUpdates().size());
       });
     }
+    logger.debug("adding Kitchen LineItems");
     if (placeOrderCommand.getKitchenLineItems().isPresent()) {
       logger.debug("createOrderFromCommand adding kitchenOrders {}", placeOrderCommand.getKitchenLineItems().get().size());
-      placeOrderCommand.getKitchenLineItems().get().forEach(v -> {
-        logger.debug("createOrderFromCommand adding kitchenItem from {}", v.toString());
-        LineItem lineItem = new LineItem(v.getItem(), v.getName(), order);
+      placeOrderCommand.getKitchenLineItems().get().forEach(commandItem -> {
+        logger.debug("createOrderFromCommand adding kitchenItem from {}", commandItem.toString());
+        LineItem lineItem = new LineItem(commandItem.getItem(), commandItem.getName(), commandItem.getPrice(), LineItemStatus.IN_PROGRESS, order);
         order.addKitchenLineItem(lineItem);
         orderEventResult.addKitchenTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
-        orderEventResult.addUpdate(new OrderUpdate(lineItem.getOrder().getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
+        orderEventResult.addUpdate(new OrderUpdate(order.getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
       });
     }
 
     orderEventResult.setOrder(order);
     orderEventResult.addEvent(OrderCreatedEvent.of(order));
+    logger.debug("Added Order and OrderCreatedEvent to OrderEventResult: {}", orderEventResult);
 
     // if this order was placed by a Loyalty Member add the appropriate event
     if (placeOrderCommand.getLoyaltyMemberId().isPresent()) {
@@ -164,7 +171,7 @@ public class Order extends PanacheEntityBase {
       orderEventResult.addEvent(LoyaltyMemberPurchaseEvent.of(order));
     }
 
-    logger.debug("returning {}", orderEventResult.toString());
+    logger.debug("returning {}", orderEventResult);
     return orderEventResult;
   }
 
@@ -173,10 +180,11 @@ public class Order extends PanacheEntityBase {
    *
    * @param lineItem
    */
-  public void addBaristaLineItem(final LineItem lineItem) {
+  public void addBaristaLineItem(LineItem lineItem) {
     if (this.baristaLineItems == null) {
       this.baristaLineItems = new ArrayList<>();
     }
+    lineItem.setOrder(this);
     this.baristaLineItems.add(lineItem);
   }
 
@@ -185,10 +193,11 @@ public class Order extends PanacheEntityBase {
    *
    * @param lineItem
    */
-  public void addKitchenLineItem(final LineItem lineItem) {
+  public void addKitchenLineItem(LineItem lineItem) {
     if (this.kitchenLineItems == null) {
       this.kitchenLineItems = new ArrayList<>();
     }
+    lineItem.setOrder(this);
     this.kitchenLineItems.add(lineItem);
   }
 
