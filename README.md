@@ -4,30 +4,38 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.  If you want
 
 ## Requirements
 
-*Docker*
-You need Docker Desktop to run the tests because the application uses Testcontainers, which use Docker, for testing
+*Java* 
+This one should be obvious.  We like [AdoptOpenJDK](https://adoptopenjdk.net/)  
 
-*Docker Compose*
-It is easy to develop locally using Docker Compose to spin up the services the application depends on.  You can of course install MongoDB and Kafka locally, but the instructions will refer to Docker
+BTW, if you want to manage multiple JDK's [SDKMan](https://sdkman.io/) is a really great tool if you haven't checked it out yet 
+
+*Docker and Docker Compose*
+You can install PostgreSQL and Kafka locally, but we have a docker-compose.yaml file that will do everything for you
 
 ## Working Locally
 
-All services in the application can be run locally
+From a terminal in Linux or MacOS run
+
+```shell
+docker-compose up
+```
+
+and then
+
+```shell
+./mvnw clean compile quarkus:dev
+```
 
 ### Environment variables
 
 Quarkus' configuration can be environment specific: https://quarkus.io/guides/config
 
 This service uses the following environment variables when running with the production profile:
-* MONGO_DB
-* MONGO_URL
-* MONGO_USERNAME
-* MONGO_PASSWORD
 * KAFKA_BOOTSTRAP_URLS
 
 You can set them all at once with the following line:
 ```shell
-export MONGO_DB=cafedb MONGO_URL=mongodb://cafe-user:redhat-20@localhost:27017/cafedb MONGO_USERNAME=cafe-user MONGO_PASSWORD=redhat-20 KAFKA_BOOTSTRAP_URLS=localhost:9092
+export KAFKA_BOOTSTRAP_URLS=localhost:9092
 ```
 
 And start Quarkus in dev mode with:
