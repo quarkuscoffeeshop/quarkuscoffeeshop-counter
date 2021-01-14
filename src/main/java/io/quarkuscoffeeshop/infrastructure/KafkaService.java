@@ -1,8 +1,8 @@
-package io.quarkuscoffeeshop.counter.infrastructure;
+package io.quarkuscoffeeshop.infrastructure;
 
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
-import io.smallrye.common.annotation.Blocking;
+import io.smallrye.reactive.messaging.annotations.Blocking;
 import io.smallrye.reactive.messaging.annotations.Merge;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;

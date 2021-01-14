@@ -1,4 +1,4 @@
-package io.quarkuscoffeeshop.counter.infrastructure;
+package io.quarkuscoffeeshop.infrastructure;
 
 import io.debezium.outbox.quarkus.ExportedEvent;
 import io.quarkuscoffeeshop.counter.domain.Order;

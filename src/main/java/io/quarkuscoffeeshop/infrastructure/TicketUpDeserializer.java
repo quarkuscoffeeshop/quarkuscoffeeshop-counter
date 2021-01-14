@@ -1,4 +1,4 @@
-package io.quarkuscoffeeshop.counter.infrastructure;
+package io.quarkuscoffeeshop.infrastructure;
 
 import io.quarkus.kafka.client.serialization.ObjectMapperDeserializer;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
