@@ -1,6 +1,5 @@
 package io.quarkuscoffeeshop.counter.infrastructure;
 
-import io.quarkuscoffeeshop.counter.domain.Order;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 

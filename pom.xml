@@ -6,7 +6,6 @@
     <groupId>io.quarkuscoffeeshop</groupId>
     <artifactId>quarkuscoffeeshop-parent</artifactId>
     <version>5.0.0-SNAPSHOT</version>
-    <relativePath>../quarkuscoffeeshop-parent</relativePath>
   </parent>
   <groupId>io.quarkuscoffeeshop</groupId>
   <artifactId>quarkuscoffeeshop-counter</artifactId>
@@ -24,21 +23,12 @@
   </dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>io.quarkuscoffeeshop</groupId>
-      <artifactId>quarkuscoffeeshop-domain</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkuscoffeeshop</groupId>
-      <artifactId>quarkuscoffeeshop-testutils</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-core</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-jsonb</artifactId>
+      <artifactId>quarkus-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>

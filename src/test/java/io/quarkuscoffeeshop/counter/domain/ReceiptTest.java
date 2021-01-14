@@ -3,7 +3,6 @@ package io.quarkuscoffeeshop.counter.domain;
 import io.quarkuscoffeeshop.domain.Item;
 import io.quarkuscoffeeshop.domain.LineItem;
 import io.quarkuscoffeeshop.domain.OrderSource;
-import io.quarkuscoffeeshop.infrastructure.JsonUtil;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

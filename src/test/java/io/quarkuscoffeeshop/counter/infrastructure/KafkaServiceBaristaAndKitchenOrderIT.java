@@ -4,7 +4,6 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkuscoffeeshop.domain.*;
 import io.quarkuscoffeeshop.infrastructure.CafeITResource;
-import io.quarkuscoffeeshop.infrastructure.JsonUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
