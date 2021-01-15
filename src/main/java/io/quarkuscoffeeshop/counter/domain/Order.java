@@ -14,10 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Entity
@@ -40,6 +37,9 @@ public class Order extends PanacheEntityBase {
 
   @Enumerated(EnumType.STRING)
   private OrderStatus orderStatus;
+
+  @Enumerated(EnumType.STRING)
+  private Location location;
 
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", cascade = CascadeType.ALL)
   private List<LineItem> baristaLineItems;
@@ -130,6 +130,7 @@ public class Order extends PanacheEntityBase {
     // build the order from the PlaceOrderCommand
     Order order = new Order(placeOrderCommand.getId());
     order.setOrderSource(placeOrderCommand.getOrderSource());
+    order.setLocation(placeOrderCommand.getLocation());
     order.setTimestamp(placeOrderCommand.getTimestamp());
     order.setOrderStatus(OrderStatus.IN_PROGRESS);
 
@@ -235,9 +236,10 @@ public class Order extends PanacheEntityBase {
     this.timestamp = Instant.now();
   }
 
-  public Order(String orderId, OrderSource orderSource, String loyaltyMemberId, Instant timestamp, OrderStatus orderStatus, List<LineItem> baristaLineItems, List<LineItem> kitchenLineItems) {
+  public Order(String orderId, OrderSource orderSource, Location location, String loyaltyMemberId, Instant timestamp, OrderStatus orderStatus, List<LineItem> baristaLineItems, List<LineItem> kitchenLineItems) {
     this.orderId = UUID.randomUUID().toString();
     this.orderSource = orderSource;
+    this.location = location;
     this.loyaltyMemberId = loyaltyMemberId;
     this.timestamp = timestamp;
     this.orderStatus = orderStatus;
@@ -247,45 +249,47 @@ public class Order extends PanacheEntityBase {
 
   @Override
   public String toString() {
-    return "Order{" +
-      "orderId='" + orderId + '\'' +
-      ", orderSource=" + orderSource +
-      ", loyaltyMemberId='" + loyaltyMemberId + '\'' +
-      ", timestamp=" + timestamp +
-      ", orderStatus=" + orderStatus +
-      ", baristaLineItems=" + baristaLineItems +
-      ", kitchenLineItems=" + kitchenLineItems +
-      '}';
+    return new StringJoiner(", ", Order.class.getSimpleName() + "[", "]")
+            .add("orderId='" + orderId + "'")
+            .add("orderSource=" + orderSource)
+            .add("loyaltyMemberId='" + loyaltyMemberId + "'")
+            .add("timestamp=" + timestamp)
+            .add("orderStatus=" + orderStatus)
+            .add("location=" + location)
+            .add("baristaLineItems=" + baristaLineItems)
+            .add("kitchenLineItems=" + kitchenLineItems)
+            .toString();
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof Order)) return false;
+    if (o == null || getClass() != o.getClass()) return false;
 
     Order order = (Order) o;
 
-    if (getOrderId() != null ? !getOrderId().equals(order.getOrderId()) : order.getOrderId() != null) return false;
-    if (getOrderSource() != order.getOrderSource()) return false;
-    if (getLoyaltyMemberId() != null ? !getLoyaltyMemberId().equals(order.getLoyaltyMemberId()) : order.getLoyaltyMemberId() != null)
+    if (orderId != null ? !orderId.equals(order.orderId) : order.orderId != null) return false;
+    if (orderSource != order.orderSource) return false;
+    if (loyaltyMemberId != null ? !loyaltyMemberId.equals(order.loyaltyMemberId) : order.loyaltyMemberId != null)
       return false;
-    if (getTimestamp() != null ? !getTimestamp().equals(order.getTimestamp()) : order.getTimestamp() != null)
+    if (timestamp != null ? !timestamp.equals(order.timestamp) : order.timestamp != null) return false;
+    if (orderStatus != order.orderStatus) return false;
+    if (location != order.location) return false;
+    if (baristaLineItems != null ? !baristaLineItems.equals(order.baristaLineItems) : order.baristaLineItems != null)
       return false;
-    if (getOrderStatus() != order.getOrderStatus()) return false;
-    if (getBaristaLineItems() != null ? !getBaristaLineItems().equals(order.getBaristaLineItems()) : order.getBaristaLineItems() != null)
-      return false;
-    return getKitchenLineItems() != null ? getKitchenLineItems().equals(order.getKitchenLineItems()) : order.getKitchenLineItems() == null;
+    return kitchenLineItems != null ? kitchenLineItems.equals(order.kitchenLineItems) : order.kitchenLineItems == null;
   }
 
   @Override
   public int hashCode() {
-    int result = getOrderId() != null ? getOrderId().hashCode() : 0;
-    result = 31 * result + (getOrderSource() != null ? getOrderSource().hashCode() : 0);
-    result = 31 * result + (getLoyaltyMemberId() != null ? getLoyaltyMemberId().hashCode() : 0);
-    result = 31 * result + (getTimestamp() != null ? getTimestamp().hashCode() : 0);
-    result = 31 * result + (getOrderStatus() != null ? getOrderStatus().hashCode() : 0);
-    result = 31 * result + (getBaristaLineItems() != null ? getBaristaLineItems().hashCode() : 0);
-    result = 31 * result + (getKitchenLineItems() != null ? getKitchenLineItems().hashCode() : 0);
+    int result = orderId != null ? orderId.hashCode() : 0;
+    result = 31 * result + (orderSource != null ? orderSource.hashCode() : 0);
+    result = 31 * result + (loyaltyMemberId != null ? loyaltyMemberId.hashCode() : 0);
+    result = 31 * result + (timestamp != null ? timestamp.hashCode() : 0);
+    result = 31 * result + (orderStatus != null ? orderStatus.hashCode() : 0);
+    result = 31 * result + (location != null ? location.hashCode() : 0);
+    result = 31 * result + (baristaLineItems != null ? baristaLineItems.hashCode() : 0);
+    result = 31 * result + (kitchenLineItems != null ? kitchenLineItems.hashCode() : 0);
     return result;
   }
 
@@ -299,6 +303,14 @@ public class Order extends PanacheEntityBase {
 
   public void setOrderSource(OrderSource orderSource) {
     this.orderSource = orderSource;
+  }
+
+  public Location getLocation() {
+    return location;
+  }
+
+  public void setLocation(Location location) {
+    this.location = location;
   }
 
   public OrderStatus getOrderStatus() {
