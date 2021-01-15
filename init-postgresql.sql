@@ -17,7 +17,7 @@ create table coffeeshop.LineItems (
 create table coffeeshop.Orders (
                         order_id varchar(255) not null,
                         loyaltyMemberId varchar(255),
-                        location varchar(255),
+                        location     varchar(255),
                         orderSource varchar(255),
                         orderStatus varchar(255),
                         timestamp timestamp,
