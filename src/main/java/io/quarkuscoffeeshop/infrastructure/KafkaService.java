@@ -32,7 +32,6 @@ public class KafkaService {
     @Incoming("orders-up")
     @Blocking
     @Transactional
-    @Merge
     public void orderUp(final TicketUp ticketUp) {
 
         logger.debug("TicketUp received: {}", ticketUp);

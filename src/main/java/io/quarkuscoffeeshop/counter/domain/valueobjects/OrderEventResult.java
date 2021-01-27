@@ -58,7 +58,6 @@ public class OrderEventResult {
   }
 
   public Optional<List<OrderTicket>> getBaristaTickets() {
-    System.out.println("returning Optional of " + this.baristaTickets.size());
     return Optional.ofNullable(this.baristaTickets);
   }
 
