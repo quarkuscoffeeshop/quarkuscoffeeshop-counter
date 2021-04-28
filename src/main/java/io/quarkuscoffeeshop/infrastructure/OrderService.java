@@ -92,4 +92,17 @@ public class OrderService {
             event.fire(exportedEvent);
         });
     }
+
+    @Override
+    public String toString() {
+        return "OrderService{" +
+                "threadContext=" + threadContext +
+                ", orderRepository=" + orderRepository +
+                ", event=" + event +
+                ", baristaEmitter=" + baristaEmitter +
+                ", kitchenEmitter=" + kitchenEmitter +
+                ", orderUpdateEmitter=" + orderUpdateEmitter +
+                '}';
+    }
+
 }
