@@ -3,6 +3,7 @@ package io.quarkuscoffeeshop.counter.infrastructure;
 import io.quarkus.test.Mock;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import io.quarkuscoffeeshop.infrastructure.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,9 @@ public class OrderServiceMock extends OrderService {
         logger.info("onOrderIn called on Mock: {}", placeOrderCommand);
     }
 
-    public void onOrderUp(final OrderTicket orderTicket) {
-        logger.info("onOrderUp called on Mock: {}", orderTicket);
+    @Override
+    public void onOrderUp(final TicketUp ticketUp) {
+
+        logger.info("onOrderUp called on Mock: {}", ticketUp);
     }
 }

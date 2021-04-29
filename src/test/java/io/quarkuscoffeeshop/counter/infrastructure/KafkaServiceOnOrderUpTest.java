@@ -12,7 +12,6 @@ import io.smallrye.reactive.messaging.connectors.InMemorySource;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import javax.enterprise.inject.Any;
 import javax.inject.Inject;
@@ -21,14 +20,13 @@ import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @QuarkusTest @QuarkusTestResource(KafkaTestResource.class) @Transactional
-public class KafkaServiceTest {
+public class KafkaServiceOnOrderUpTest {
 
-    @ConfigProperty(name = "mp.messaging.incoming.orders-in.topic")
-    protected String ORDERS_IN;
+    @ConfigProperty(name = "mp.messaging.incoming.orders-up.topic")
+    protected String ORDERS_UP;
 
     // this is being Mocked by OrderServiceMock to avoid database dependencies
     @InjectSpy
@@ -38,27 +36,21 @@ public class KafkaServiceTest {
     @Any
     InMemoryConnector connector;
 
-    InMemorySource<PlaceOrderCommand> ordersIn;
-
-    @BeforeEach
-    public void setUp() {
-        ordersIn = connector.source(ORDERS_IN);
-    }
+    InMemorySource<TicketUp> ordersUp;
 
     /**
-     * Verify that the appropriate method is called on OrderService when a PlaceOrderCommand is received
-     * @see OrderService
+     * Verify that the appropriate method is called on OrderService when a TicketUp is received
+     * @see TicketUp
      * @see PlaceOrderCommand
      *
      */
     @Test
-    public void testOrderIn() {
+    public void testOrderUp() {
 
-        PlaceOrderCommand placeOrderCommand = TestUtil.stubPlaceOrderCommand();
-        InMemorySource<PlaceOrderCommand> ordersIn = connector.source(ORDERS_IN);
-        ordersIn.send(placeOrderCommand);
+        TicketUp orderTicketUp = TestUtil.stubOrderTicketUp();
+        ordersUp = connector.source(ORDERS_UP);
+        ordersUp.send(orderTicketUp);
         await().atLeast(2, TimeUnit.SECONDS);
-        verify(orderService).onOrderIn(any(PlaceOrderCommand.class));
+        verify(orderService, times(1)).onOrderUp(any(TicketUp.class));
     }
-
 }
