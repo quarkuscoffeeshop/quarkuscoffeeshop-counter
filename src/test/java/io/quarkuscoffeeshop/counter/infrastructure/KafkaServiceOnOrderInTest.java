@@ -4,7 +4,6 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectSpy;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
-import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import io.quarkuscoffeeshop.infrastructure.OrderService;
 import io.quarkuscoffeeshop.testing.TestUtil;
 import io.smallrye.reactive.messaging.connectors.InMemoryConnector;
@@ -12,7 +11,6 @@ import io.smallrye.reactive.messaging.connectors.InMemorySource;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import javax.enterprise.inject.Any;
 import javax.inject.Inject;
@@ -21,11 +19,10 @@ import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @QuarkusTest @QuarkusTestResource(KafkaTestResource.class) @Transactional
-public class KafkaServiceTest {
+public class KafkaServiceOnOrderInTest {
 
     @ConfigProperty(name = "mp.messaging.incoming.orders-in.topic")
     protected String ORDERS_IN;
