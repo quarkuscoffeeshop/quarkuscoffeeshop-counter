@@ -30,7 +30,7 @@ public class KafkaServiceOnOrderUpTest {
 
     // this is being Mocked by OrderServiceMock to avoid database dependencies
     @InjectSpy
-    OrderService orderService;
+    OrderServiceMock orderService;
 
     @Inject
     @Any
