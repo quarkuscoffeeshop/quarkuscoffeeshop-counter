@@ -9,6 +9,7 @@ import io.quarkuscoffeeshop.testing.TestUtil;
 import io.smallrye.reactive.messaging.connectors.InMemoryConnector;
 import io.smallrye.reactive.messaging.connectors.InMemorySource;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @QuarkusTest @QuarkusTestResource(KafkaTestResource.class) @Transactional
@@ -55,7 +57,7 @@ public class KafkaServiceOnOrderInTest {
         InMemorySource<PlaceOrderCommand> ordersIn = connector.source(ORDERS_IN);
         ordersIn.send(placeOrderCommand);
         await().atLeast(2, TimeUnit.SECONDS);
-        verify(orderService).onOrderIn(any(PlaceOrderCommand.class));
+        verify(orderService, times(1)).onOrderIn(any(PlaceOrderCommand.class));
     }
 
 }
