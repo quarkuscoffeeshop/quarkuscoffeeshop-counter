@@ -39,10 +39,10 @@ public class KafkaServiceOnOrderInTest {
 
     InMemorySource<PlaceOrderCommand> ordersIn;
 
-    @BeforeEach
-    public void setUp() {
-        ordersIn = connector.source(ORDERS_IN);
-    }
+//    @BeforeEach
+//    public void setUp() {
+//        ordersIn = connector.source(ORDERS_IN);
+//    }
 
     /**
      * Verify that the appropriate method is called on OrderService when a PlaceOrderCommand is received
