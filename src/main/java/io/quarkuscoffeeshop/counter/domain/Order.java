@@ -62,14 +62,14 @@ public class Order extends PanacheEntityBase {
     // set the LineItem's new status
     if (this.getBaristaLineItems().isPresent()) {
       this.getBaristaLineItems().get().stream().forEach(lineItem -> {
-        if(lineItem.getItemId().equals(lineItem.getItemId())){
+        if(lineItem.getItemId().equals(ticketUp.lineItemId)){
           lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
         }
       });
     }
     if (this.getKitchenLineItems().isPresent()) {
       this.getKitchenLineItems().get().stream().forEach(lineItem -> {
-        if(lineItem.getItemId().equals(lineItem.getItemId())){
+        if(lineItem.getItemId().equals(ticketUp.lineItemId)){
           lineItem.setLineItemStatus(LineItemStatus.FULFILLED);
         }
       });
