@@ -19,14 +19,18 @@ import java.util.UUID;
 
 public class TestUtil {
 
-    public static PlaceOrderCommand stubPlaceOrderCommand() {
+    public static PlaceOrderCommand stubPlaceOrderCommand(final String id) {
         return new PlaceOrderCommand(
-                UUID.randomUUID().toString(),
+                id,
                 OrderSource.WEB,
                 Location.ATLANTA,
                 UUID.randomUUID().toString(),
                 Optional.of(stubSingleBaristaItem()),
                 Optional.empty());
+    }
+
+    public static PlaceOrderCommand stubPlaceOrderCommand() {
+        return stubPlaceOrderCommand(UUID.randomUUID().toString());
     };
 
     private static List<CommandItem> stubSingleBaristaItem() {

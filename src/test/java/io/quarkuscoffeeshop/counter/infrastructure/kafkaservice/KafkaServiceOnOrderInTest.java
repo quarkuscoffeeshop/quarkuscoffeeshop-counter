@@ -1,7 +1,7 @@
-package io.quarkuscoffeeshop.counter.infrastructure;
+package io.quarkuscoffeeshop.counter.infrastructure.kafkaservice;
 
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.mockito.InjectSpy;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.infrastructure.OrderService;
@@ -9,8 +9,6 @@ import io.quarkuscoffeeshop.testing.TestUtil;
 import io.smallrye.reactive.messaging.connectors.InMemoryConnector;
 import io.smallrye.reactive.messaging.connectors.InMemorySource;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.enterprise.inject.Any;
@@ -23,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@QuarkusTest @QuarkusTestResource(KafkaTestResource.class) @Transactional
+@QuarkusTest @Transactional @TestProfile(KafkaOrderInProfile.class)
 public class KafkaServiceOnOrderInTest {
 
     @ConfigProperty(name = "mp.messaging.incoming.orders-in.topic")
@@ -36,13 +34,6 @@ public class KafkaServiceOnOrderInTest {
     @Inject
     @Any
     InMemoryConnector connector;
-
-    InMemorySource<PlaceOrderCommand> ordersIn;
-
-//    @BeforeEach
-//    public void setUp() {
-//        ordersIn = connector.source(ORDERS_IN);
-//    }
 
     /**
      * Verify that the appropriate method is called on OrderService when a PlaceOrderCommand is received
