@@ -8,9 +8,13 @@ import io.quarkuscoffeeshop.infrastructure.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Alternative;
 
-@Mock @ApplicationScoped
+@Alternative
+@Priority(1)
+@ApplicationScoped
 public class OrderServiceMock extends OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceMock.class);
