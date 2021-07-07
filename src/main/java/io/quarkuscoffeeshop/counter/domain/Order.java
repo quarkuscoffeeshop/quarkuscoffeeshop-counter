@@ -231,13 +231,13 @@ public class Order extends PanacheEntityBase {
     this.timestamp = Instant.now();
   }
 
-  public Order(String orderId){
+  public Order(final String orderId){
     this.orderId = orderId;
     this.timestamp = Instant.now();
   }
 
-  public Order(String orderId, OrderSource orderSource, Location location, String loyaltyMemberId, Instant timestamp, OrderStatus orderStatus, List<LineItem> baristaLineItems, List<LineItem> kitchenLineItems) {
-    this.orderId = UUID.randomUUID().toString();
+  public Order(final String orderId, final OrderSource orderSource, final Location location, final String loyaltyMemberId, final Instant timestamp, final OrderStatus orderStatus, final List<LineItem> baristaLineItems, final List<LineItem> kitchenLineItems) {
+    this.orderId = orderId;
     this.orderSource = orderSource;
     this.location = location;
     this.loyaltyMemberId = loyaltyMemberId;

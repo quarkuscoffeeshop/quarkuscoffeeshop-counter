@@ -8,15 +8,13 @@ import io.quarkus.test.junit.mockito.InjectSpy;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import io.quarkuscoffeeshop.infrastructure.OrderService;
+import io.quarkuscoffeeshop.testing.MockOrderServiceProfile;
 import io.quarkuscoffeeshop.testing.TestUtil;
 import io.smallrye.reactive.messaging.connectors.InMemoryConnector;
 import io.smallrye.reactive.messaging.connectors.InMemorySource;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import javax.enterprise.inject.Any;
 import javax.inject.Inject;
