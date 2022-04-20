@@ -1,14 +1,12 @@
-package io.quarkuscoffeeshop.testing;
+package io.quarkuscoffeeshop.counter.domain;
 
 import io.debezium.outbox.quarkus.ExportedEvent;
-import io.quarkuscoffeeshop.counter.domain.*;
 import io.quarkuscoffeeshop.counter.domain.commands.CommandItem;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.events.OrderCreatedEvent;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -38,16 +36,19 @@ public class TestUtil {
     }
 
     public static Order stubOrder() {
-        Order order = new Order(
+        OrderRecord orderRecord = new OrderRecord(
                 UUID.randomUUID().toString(),
                 OrderSource.COUNTER,
-                Location.RALEIGH,
-                UUID.randomUUID().toString(),
+                null,
                 Instant.now(),
                 OrderStatus.PLACED,
+                Location.ATLANTA,
                 null,
                 null);
-        order.addBaristaLineItem(new LineItem(Item.COFFEE_BLACK, "Rocky", BigDecimal.valueOf(3.00), LineItemStatus.PLACED, order));
+
+        Order order = Order.fromOrderRecord(orderRecord);
+
+        order.addBaristaLineItem(new LineItem(Item.COFFEE_BLACK, "Rocky", BigDecimal.valueOf(3.00), LineItemStatus.PLACED, orderRecord));
         return order;
     }
 

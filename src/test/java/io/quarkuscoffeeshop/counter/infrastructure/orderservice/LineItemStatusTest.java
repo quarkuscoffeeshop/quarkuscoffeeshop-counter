@@ -1,5 +1,6 @@
 package io.quarkuscoffeeshop.counter.infrastructure.orderservice;
 
+import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkuscoffeeshop.counter.domain.LineItem;
@@ -9,7 +10,7 @@ import io.quarkuscoffeeshop.counter.domain.OrderRepository;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import io.quarkuscoffeeshop.infrastructure.OrderService;
-import io.quarkuscoffeeshop.testing.TestUtil;
+import io.quarkuscoffeeshop.counter.domain.TestUtil;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -27,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * OrderService is the object under test because it orchestrates the creation and persistence of the Order, the parent object of the LineItem
  */
 @QuarkusTest
-@Transactional
 @TestProfile(OrderServiceTestProfile.class)
 public class LineItemStatusTest {
 
@@ -39,12 +39,11 @@ public class LineItemStatusTest {
     @Inject
     OrderRepository orderRepository;
 
-    @Test
+    @Test @TestTransaction
     public void testStatusAfterOrderIsPlaced() {
 
         PlaceOrderCommand placeOrderCommand = TestUtil.stubPlaceOrderCommand(orderId);
         orderService.onOrderIn(placeOrderCommand);
-
         await().atLeast(2, TimeUnit.SECONDS);
 
         long count = orderRepository.count();

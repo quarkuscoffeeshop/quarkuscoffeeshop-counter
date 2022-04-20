@@ -17,7 +17,7 @@ public class LineItem extends PanacheEntityBase {
   @JsonIgnore
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "order_id", nullable = false)
-  Order order;
+  OrderRecord order;
 
   @Id
   @Column(nullable = false, unique = true)
@@ -37,7 +37,7 @@ public class LineItem extends PanacheEntityBase {
     this.itemId = UUID.randomUUID().toString();
   }
 
-  public LineItem(Item item, String name, BigDecimal price, LineItemStatus lineItemStatus, Order order) {
+  public LineItem(Item item, String name, BigDecimal price, LineItemStatus lineItemStatus, OrderRecord order) {
     this.itemId = UUID.randomUUID().toString();
     this.item = item;
     this.name = name;
@@ -112,11 +112,7 @@ public class LineItem extends PanacheEntityBase {
     this.lineItemStatus = lineItemStatus;
   }
 
-  public Order getOrder() {
-    return order;
-  }
-
-  public void setOrder(Order order) {
+  public void setOrder(OrderRecord order) {
     this.order = order;
   }
 
