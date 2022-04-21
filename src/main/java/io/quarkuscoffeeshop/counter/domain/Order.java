@@ -1,6 +1,5 @@
 package io.quarkuscoffeeshop.counter.domain;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.events.LoyaltyMemberPurchaseEvent;
 import io.quarkuscoffeeshop.counter.domain.events.OrderCreatedEvent;
@@ -12,10 +11,11 @@ import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
+import javax.persistence.Transient;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
+
 
 public class Order {
 
@@ -29,6 +29,7 @@ public class Order {
     order.orderRecord = orderRecord;
     return order;
   }
+
   /**
    * Updates the lineItem corresponding to the ticket, creates the appropriate domain events,
    * creates value objects to notify the system, checks the order to see if all items are completed,
@@ -98,16 +99,14 @@ public class Order {
   }
 
   /**
-   * Creates and returns a new OrderEventResult containing the Order aggregate built from the PlaceOrderCommand
-   * and an OrderCreatedEvent
+   * Create a new Order from a PlaceOrderCommand
    *
-   * @param placeOrderCommand PlaceOrderCommand
-   * @return OrderEventResult
+   * @param placeOrderCommand
+   * @return
    */
-  public static OrderEventResult process(final PlaceOrderCommand placeOrderCommand) {
+  protected static Order fromPlaceOrderCommand(final PlaceOrderCommand placeOrderCommand) {
 
-    // create the return value
-    OrderEventResult orderEventResult = new OrderEventResult();
+    logger.debug("creating a new Order from: {}", placeOrderCommand);
 
     // build the order from the PlaceOrderCommand
     Order order = new Order(placeOrderCommand.getId());
@@ -115,48 +114,92 @@ public class Order {
     order.setLocation(placeOrderCommand.getLocation());
     order.setTimestamp(placeOrderCommand.getTimestamp());
     order.setOrderStatus(OrderStatus.IN_PROGRESS);
+    if (placeOrderCommand.getLoyaltyMemberId().isPresent()) {
+      order.setLoyaltyMemberId(placeOrderCommand.getLoyaltyMemberId().get());
+    }
 
     if (placeOrderCommand.getBaristaLineItems().isPresent()) {
-      logger.debug("createOrderFromCommand adding beverages {}", placeOrderCommand.getBaristaLineItems().get().size());
-
-      logger.debug("adding Barista LineItems");
       placeOrderCommand.getBaristaLineItems().get().forEach(commandItem -> {
         logger.debug("createOrderFromCommand adding baristaItem from {}", commandItem.toString());
         LineItem lineItem = new LineItem(commandItem.getItem(), commandItem.getName(), commandItem.getPrice(), LineItemStatus.IN_PROGRESS, order.getOrderRecord());
         order.addBaristaLineItem(lineItem);
-        logger.debug("added LineItem: {}", order.getBaristaLineItems().get().size());
-        orderEventResult.addBaristaTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
-        logger.debug("Added Barista Ticket to OrderEventResult: {}", orderEventResult.getBaristaTickets().get().size());
-        orderEventResult.addUpdate(new OrderUpdate(order.getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
-        logger.debug("Added Order Update to OrderEventResult: ", orderEventResult.getOrderUpdates().size());
       });
     }
-    logger.debug("adding Kitchen LineItems");
+
     if (placeOrderCommand.getKitchenLineItems().isPresent()) {
       logger.debug("createOrderFromCommand adding kitchenOrders {}", placeOrderCommand.getKitchenLineItems().get().size());
       placeOrderCommand.getKitchenLineItems().get().forEach(commandItem -> {
-        logger.debug("createOrderFromCommand adding kitchenItem from {}", commandItem.toString());
         LineItem lineItem = new LineItem(commandItem.getItem(), commandItem.getName(), commandItem.getPrice(), LineItemStatus.IN_PROGRESS, order.getOrderRecord());
         order.addKitchenLineItem(lineItem);
-        orderEventResult.addKitchenTicket(new OrderTicket(order.getOrderId(), lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
-        orderEventResult.addUpdate(new OrderUpdate(order.getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
       });
     }
 
+    return order;
+  }
+
+  private static List<OrderUpdate> createOrderUpdates(Order order) {
+
+    List<OrderUpdate> orderUpdates = new ArrayList<>();
+
+    // create required BaristaTicket, KitchenTicket, and OrderUpdate value objects
+    if (order.getBaristaLineItems().isPresent()) {
+      order.getBaristaLineItems().get().forEach(lineItem -> {
+        orderUpdates.add(new OrderUpdate(order.getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
+      });
+    }
+    if (order.getKitchenLineItems().isPresent()) {
+      order.getKitchenLineItems().get().forEach(lineItem -> {
+        orderUpdates.add(new OrderUpdate(order.getOrderId(), lineItem.getItemId(), lineItem.getName(), lineItem.getItem(), OrderStatus.IN_PROGRESS));
+      });
+    }
+    return orderUpdates;
+  }
+
+  private static List<OrderTicket> createOrderTickets(String orderId, List<LineItem> lineItems) {
+    List<OrderTicket> orderTickets = new ArrayList<>(lineItems.size());
+    lineItems.forEach(lineItem -> {
+      orderTickets.add(new OrderTicket(orderId, lineItem.getItemId(), lineItem.getItem(), lineItem.getName()));
+    });
+    return orderTickets;
+  }
+  /**
+   * Creates and returns a new OrderEventResult containing the Order aggregate built from the PlaceOrderCommand
+   * and an OrderCreatedEvent
+   *
+   * @param placeOrderCommand PlaceOrderCommand
+   * @return OrderEventResult
+   */
+  public static OrderEventResult createFromCommand(final PlaceOrderCommand placeOrderCommand) {
+
+    Order order = Order.fromPlaceOrderCommand(placeOrderCommand);
+
+    // create the return value
+    OrderEventResult orderEventResult = new OrderEventResult();
     orderEventResult.setOrder(order);
+
+    // create required BaristaTicket, KitchenTicket, and OrderUpdate value objects
+    if (order.getBaristaLineItems().isPresent()) {
+      orderEventResult.setBaristaTickets(createOrderTickets(order.getOrderId(), order.getBaristaLineItems().get()));
+    }
+
+    if (order.getKitchenLineItems().isPresent()) {
+      orderEventResult.setKitchenTickets(createOrderTickets(order.getOrderId(), order.getKitchenLineItems().get()));
+    }
+
+    // add updates
+    orderEventResult.setOrderUpdates(createOrderUpdates(order));
+
     orderEventResult.addEvent(OrderCreatedEvent.of(order));
-    logger.debug("Added Order and OrderCreatedEvent to OrderEventResult: {}", orderEventResult);
 
     // if this order was placed by a Loyalty Member add the appropriate event
     if (placeOrderCommand.getLoyaltyMemberId().isPresent()) {
-      logger.debug("creating LoyaltyMemberPurchaseEvent from {}", placeOrderCommand.toString());
-      order.setLoyaltyMemberId(placeOrderCommand.getLoyaltyMemberId().get());
       orderEventResult.addEvent(LoyaltyMemberPurchaseEvent.of(order));
     }
 
     logger.debug("returning {}", orderEventResult);
     return orderEventResult;
   }
+
 
   /**
    * Convenience method to prevent Null Pointer Exceptions
@@ -298,7 +341,7 @@ public class Order {
     this.orderRecord.setTimestamp(timestamp);
   }
 
-  public OrderRecord getOrderRecord() {
+  protected OrderRecord getOrderRecord() {
     return this.orderRecord;
   }
 }

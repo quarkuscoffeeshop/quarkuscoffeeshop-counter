@@ -10,13 +10,13 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.  If you want
 *Java* 
 This one should be obvious.  We like [AdoptOpenJDK](https://adoptopenjdk.net/)  
 
-BTW, if you want to manage multiple JDK's [SDKMan](https://sdkman.io/) is a really great tool if you haven't checked it out yet 
+BTW, if you want to manage multiple JDK's [SDKMan](https://sdkman.io/) is a great tool 
 
 *Docker and Docker Compose*
 You can install PostgreSQL and Kafka locally, but we have a docker-compose.yaml file that will do everything for you
 
-The docker-compose file 
 ## Working Locally
+Grab the supporting files
 
 ### Supporting infrastructure
 
@@ -41,6 +41,8 @@ From the quarkuscoffeeshop-counter directory you can start the counter microserv
 ```shell
 ./mvnw clean compile quarkus:dev
 ```
+
+Quarkus can be run in "dev" mode.  You can find out more about Dev mode in the excellent [Quarkus Dev Mode Guide](https://quarkus.io/guides/maven-tooling#dev-mode)
 
 ### Kafka Consumers and Producers
 

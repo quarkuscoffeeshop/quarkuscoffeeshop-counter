@@ -47,11 +47,11 @@ public class OrderService {
 
         logger.debug("onOrderIn {}", placeOrderCommand);
 
-        OrderEventResult orderEventResult = Order.process(placeOrderCommand);
+        OrderEventResult orderEventResult = Order.createFromCommand(placeOrderCommand);
 
         logger.debug("OrderEventResult returned: {}", orderEventResult);
 
-        orderRepository.persist(orderEventResult.getOrder().getOrderRecord());
+        orderRepository.persist(orderEventResult.getOrder());
 
         orderEventResult.getOutboxEvents().forEach(exportedEvent -> {
             logger.debug("Firing event: {}", exportedEvent);
@@ -84,7 +84,7 @@ public class OrderService {
         Order order = orderRepository.findById(ticketUp.getOrderId());
         OrderEventResult orderEventResult = order.applyOrderTicketUp(ticketUp);
         logger.debug("OrderEventResult returned: {}", orderEventResult);
-        orderRepository.persist(orderEventResult.getOrder().getOrderRecord());
+        orderRepository.persist(orderEventResult.getOrder());
         orderEventResult.getOrderUpdates().forEach(orderUpdate -> {
             orderUpdateEmitter.send(orderUpdate);
         });

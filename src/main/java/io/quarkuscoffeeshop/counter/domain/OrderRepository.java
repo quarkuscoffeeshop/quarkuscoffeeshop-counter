@@ -12,4 +12,8 @@ public class OrderRepository implements PanacheRepository<OrderRecord> {
         return Order.fromOrderRecord(orderRecord);
     }
 
+    public void persist(Order order) {
+        this.persist(order.getOrderRecord());
+    }
+
 }

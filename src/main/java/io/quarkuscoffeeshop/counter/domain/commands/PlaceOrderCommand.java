@@ -107,4 +107,5 @@ public class PlaceOrderCommand {
   public Instant getTimestamp() {
     return timestamp;
   }
+
 }

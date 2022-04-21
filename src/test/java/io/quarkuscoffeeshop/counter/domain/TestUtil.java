@@ -35,6 +35,10 @@ public class TestUtil {
         return Arrays.asList(new CommandItem(Item.COFFEE_BLACK, "Foo", BigDecimal.valueOf(3.25)));
     }
 
+    private static List<CommandItem> stubSingleKitchenItem() {
+        return Arrays.asList(new CommandItem(Item.CROISSANT, "Foo", BigDecimal.valueOf(3.25)));
+    }
+
     public static Order stubOrder() {
         OrderRecord orderRecord = new OrderRecord(
                 UUID.randomUUID().toString(),
@@ -87,5 +91,28 @@ public class TestUtil {
                 "Capt. Kirk",
                 "Mr. Spock"
         );
+    }
+
+    public static PlaceOrderCommand stubPlaceOrderCommandSingleCroissant() {
+
+        return new PlaceOrderCommand(
+                UUID.randomUUID().toString(),
+                OrderSource.WEB,
+                Location.ATLANTA,
+                UUID.randomUUID().toString(),
+                Optional.empty(),
+                Optional.of(stubSingleKitchenItem()));
+
+    }
+
+    public static PlaceOrderCommand stubPlaceOrderCommandBlackCoffeeAndCroissant() {
+
+        return new PlaceOrderCommand(
+                UUID.randomUUID().toString(),
+                OrderSource.WEB,
+                Location.ATLANTA,
+                UUID.randomUUID().toString(),
+                Optional.of(stubSingleBaristaItem()),
+                Optional.of(stubSingleKitchenItem()));
     }
 }
