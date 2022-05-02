@@ -211,7 +211,11 @@ public class Order {
       lineItem.setOrder(this.orderRecord);
       this.getBaristaLineItems().get().add(lineItem);
     }else{
-      this.orderRecord.setBaristaLineItems(Collections.singletonList(lineItem));
+      if (this.orderRecord.getBaristaLineItems() == null) {
+        this.orderRecord.setBaristaLineItems(new ArrayList<LineItem>(){{ add(lineItem); }});
+      }else{
+        this.orderRecord.getBaristaLineItems().add(lineItem);
+      }
     }
   }
 
@@ -225,7 +229,11 @@ public class Order {
       lineItem.setOrder(this.orderRecord);
       this.getKitchenLineItems().get().add(lineItem);
     }else {
-      this.orderRecord.setKitchenLineItems(Collections.singletonList(lineItem));
+      if (this.orderRecord.getKitchenLineItems() == null) {
+        this.orderRecord.setKitchenLineItems(new ArrayList<LineItem>(){{ add(lineItem); }});
+      }else{
+        this.orderRecord.getKitchenLineItems().add(lineItem);
+      }
     }
   }
 
