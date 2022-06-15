@@ -1,7 +1,9 @@
 # Docs
 Please see the Github Pages Site for complete documentation: [quarkuscoffeeshop.github.io](https://quarkuscoffeeshop.github.io)
 
-# Quarkus Coffeeshop Core Microservice
+# About 
+
+This repos contains the Quarkus Coffeeshop Counter Microservice.  The Counter microservice coordinates events in the system.  It receives orders from the Web microservice from a Kakfa topic, records the orders in a database, sends messages to the Barista and Kitchen microservices, listens for updates from the Barista and Kitchen microservices, and updates the Web microservice.
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.  If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
@@ -41,8 +43,6 @@ From the quarkuscoffeeshop-counter directory you can start the counter microserv
 ```shell
 ./mvnw clean compile quarkus:dev
 ```
-
-Quarkus can be run in "dev" mode.  You can find out more about Dev mode in the excellent [Quarkus Dev Mode Guide](https://quarkus.io/guides/maven-tooling#dev-mode)
 
 ### Kafka Consumers and Producers
 
