@@ -8,6 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 public class OrderRepository implements PanacheRepository<Order> {
 
     public Order findById(final String orderId) {
+
         return Order.findById(orderId);
     }
 }

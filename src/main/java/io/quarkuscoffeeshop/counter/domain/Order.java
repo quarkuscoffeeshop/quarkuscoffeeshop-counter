@@ -5,10 +5,7 @@ import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.events.LoyaltyMemberPurchaseEvent;
 import io.quarkuscoffeeshop.counter.domain.events.OrderCreatedEvent;
 import io.quarkuscoffeeshop.counter.domain.events.OrderUpdatedEvent;
-import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderEventResult;
-import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderTicket;
-import io.quarkuscoffeeshop.counter.domain.valueobjects.OrderUpdate;
-import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
+import io.quarkuscoffeeshop.counter.domain.valueobjects.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,11 +45,8 @@ public class Order extends PanacheEntityBase {
   private List<LineItem> kitchenLineItems;
 
   /**
-   * Updates the lineItem corresponding to the ticket, creates the appropriate domain events,
-   * creates value objects to notify the system, checks the order to see if all items are completed,
-   * and updates the order if necessary
-   *
-   * All corresponding objects are returned in an OrderEventResult
+   * Each time a TicketUp is received the Order should be checked for completion.
+   * An Order is complete when every LineItem is fulfilled.
    *
    * @param ticketUp
    * @return OrderEventResult
