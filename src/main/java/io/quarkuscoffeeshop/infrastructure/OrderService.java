@@ -42,12 +42,11 @@ public class OrderService {
     @Channel("web-updates")
     Emitter<OrderUpdate> orderUpdateEmitter;
 
-    @Transactional
     public void onOrderIn(final PlaceOrderCommand placeOrderCommand) {
 
         logger.debug("onOrderIn {}", placeOrderCommand);
 
-        OrderEventResult orderEventResult = Order.process(placeOrderCommand);
+        OrderEventResult orderEventResult = Order.createFromCommand(placeOrderCommand);
 
         logger.debug("OrderEventResult returned: {}", orderEventResult);
 

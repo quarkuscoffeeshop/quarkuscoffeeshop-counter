@@ -6,7 +6,7 @@ import io.quarkuscoffeeshop.counter.domain.*;
 import io.quarkuscoffeeshop.counter.domain.commands.PlaceOrderCommand;
 import io.quarkuscoffeeshop.counter.domain.valueobjects.TicketUp;
 import io.quarkuscoffeeshop.infrastructure.OrderService;
-import io.quarkuscoffeeshop.testing.TestUtil;
+import io.quarkuscoffeeshop.counter.domain.TestUtil;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;

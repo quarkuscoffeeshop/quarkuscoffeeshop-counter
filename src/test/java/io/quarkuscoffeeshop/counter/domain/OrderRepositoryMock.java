@@ -16,7 +16,7 @@ public class OrderRepositoryMock extends OrderRepository{
     private static final Logger logger = LoggerFactory.getLogger(OrderRepositoryMock.class);
 
     @Override
-    public void persist(Order order) {
-        logger.debug("mocking persist for {}", order);
+    public void persist(OrderRecord orderRecord) {
+        logger.debug("mocking persist for {}", orderRecord);
     }
 }

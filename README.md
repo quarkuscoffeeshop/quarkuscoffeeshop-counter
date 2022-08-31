@@ -1,7 +1,9 @@
 # Docs
 Please see the Github Pages Site for complete documentation: [quarkuscoffeeshop.github.io](https://quarkuscoffeeshop.github.io)
 
-# Quarkus Coffeeshop Core Microservice
+# About 
+
+This repos contains the Quarkus Coffeeshop Counter Microservice.  The Counter microservice coordinates events in the system.  It receives orders from the Web microservice from a Kakfa topic, records the orders in a database, sends messages to the Barista and Kitchen microservices, listens for updates from the Barista and Kitchen microservices, and updates the Web microservice.
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.  If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
@@ -10,13 +12,13 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.  If you want
 *Java* 
 This one should be obvious.  We like [AdoptOpenJDK](https://adoptopenjdk.net/)  
 
-BTW, if you want to manage multiple JDK's [SDKMan](https://sdkman.io/) is a really great tool if you haven't checked it out yet 
+BTW, if you want to manage multiple JDK's [SDKMan](https://sdkman.io/) is a great tool 
 
 *Docker and Docker Compose*
 You can install PostgreSQL and Kafka locally, but we have a docker-compose.yaml file that will do everything for you
 
-The docker-compose file 
 ## Working Locally
+Grab the supporting files
 
 ### Supporting infrastructure
 
